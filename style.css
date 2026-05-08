@@ -1,0 +1,107 @@
+body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+        text-align: center;
+        padding-top: 40px;
+    }
+    select {
+        display: block;
+        margin: 0 auto;
+        padding: 8px 12px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        cursor: pointer;
+        background: white;
+        min-width: 260px;
+    }
+    select:focus { outline: none; border-color: #378ADD; box-shadow: 0 0 0 3px rgba(55,138,221,0.15); }
+
+    .rumus-box {
+        display: none;
+        margin: 16px auto 0;
+        width: fit-content;
+        max-width: 480px;
+        background: white;
+        border: 1px solid #d0e4f7;
+        border-radius: 12px;
+        padding: 16px 28px;
+        text-align: center;
+    }
+    .rumus-box.show { display: block; }
+    .rumus-judul { font-size: 13px; color: #888; margin-bottom: 6px; }
+    .rumus-utama { font-size: 22px; font-weight: bold; color: #000; margin-bottom: 6px; }
+    .rumus-syarat { font-size: 12px; color: #e24b4a; margin-top: 6px; }
+
+    .dropdown { position: relative; width: 220px; margin: 0 auto; }
+    .dd-btn {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 8px 12px; font-size: 14px;
+        border: 1px solid #ccc; border-radius: 8px; cursor: pointer; background: white;
+    }
+    .dd-btn:hover { border-color: #999; }
+    .dd-left { display: flex; align-items: center; gap: 8px; }
+    .dot { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.15); flex-shrink: 0; }
+    .dd-list {
+        display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+        border: 1px solid #ccc; border-radius: 8px; background: white; overflow: hidden; z-index: 10;
+    }
+    .dd-list.show { display: block; }
+    .dd-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; font-size: 14px; cursor: pointer; }
+    .dd-item:hover { background: #f5f5f5; }
+    .dd-item.selected { background: #eef5ff; font-weight: bold; }
+
+    #area-soal {
+        display: none;
+        margin: 30px auto 40px;
+        max-width: 660px;
+        background: white;
+        border-radius: 16px;
+        padding: 28px 32px;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+        text-align: center;
+    }
+    #area-soal.show { display: block; }
+    .soal-badge {
+        display: inline-block;
+        background: #fdfdfd; color: #4e4e4e;
+        font-size: 12px; font-weight: bold;
+        padding: 4px 12px; border-radius: 20px;
+        margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .soal-teks { font-size: 28px; font-weight: bold; color: #111; margin-bottom: 24px; }
+    .baris-label { font-size: 13px; color: #666; margin-bottom: 8px; font-weight: bold; text-align: center; }
+    .baris-kotak { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 20px; }
+    .kotak {
+        width: 50px; height: 50px;
+        border: 2px solid #ccc; border-radius: 8px;
+        cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        transition: border-color 0.15s, transform 0.1s;
+        background: #fafafa;
+    }
+    .kotak:hover { border-color: #888; transform: scale(1.05); }
+    .kotak.aktif { border-color: #444; background: #f0f0f0; }
+    .lingkaran {
+        width: 32px; height: 32px;
+        border-radius: 50%; display: none;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .kotak.aktif .lingkaran { display: block; }
+    .divider { border: none; border-top: 2px dashed #e0e0e0; margin: 4px 0 20px; }
+    /* === .btn-cek {
+    padding: 10px 32px; font-size: 15px; font-weight: bold;
+    background: #639922; color: white; border: none; border-radius: 8px; cursor: pointer;
+    }
+    .btn-cek:hover { background: #4e7a1a; }
+    
+    .btn-batal {
+        margin-left: 10px; padding: 10px 24px; font-size: 15px;
+        background: #eee; color: #555; border: 1px solid #ccc; border-radius: 8px; cursor: pointer;
+    }
+    .btn-batal:hover { background: #ddd; } === */
+    
+    /* INI yang paling penting — tanpa ini jawaban selalu muncul */
+    .hasil-cek { display: none; margin-top: 16px; padding: 12px 20px; border-radius: 10px; font-size: 18px; font-weight: bold; }
+    .hasil-cek.benar { display: block; color: #000000; }
+    .hasil-cek.salah { display: block; color: #c62828; }
