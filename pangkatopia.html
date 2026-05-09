@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pangkatopia</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="pangkatopia.css">
+</head>
+<body>
+
+<div class="dust" id="dust"></div>
+
+<div class="stage">
+  <div class="koper-wrap" id="kw">
+
+    <div class="handle"></div>
+
+    <!-- LID: bersih -->
+    <div class="lid">
+      <div class="lid-inner wood">
+        <div class="corner tl"></div>
+        <div class="corner tr"></div>
+        <div class="corner bl"></div>
+        <div class="corner br"></div>
+      </div>
+    </div>
+
+    <!-- HINGE + BUKA -->
+    <div class="hinge-bar">
+      <div class="rivet"></div>
+      <button class="btn-buka" onclick="openK()">BUKA</button>
+      <div class="rivet"></div>
+    </div>
+
+    <!-- BASE: bersih -->
+    <div class="base">
+      <div class="base-inner wood">
+        <div class="corner bl"></div>
+        <div class="corner br"></div>
+      </div>
+    </div>
+
+    <!-- OPEN BOARD -->
+    <div class="open-board" id="ob">
+
+      <div class="ob-top">
+        <div class="wood-panel wood">
+          <div class="ob-top-inner">
+            <div class="corner tl"></div>
+            <div class="corner tr"></div>
+            <div class="board-title">PANGKATOPIA</div>
+            <div class="lbl-row">
+                <select class="tag select-tag" id="sifatSelect">
+                    <option value="">SIFAT</option> 
+                    <option value="perkalian">aᵐ × aⁿ = aᵐ⁺ⁿ</option>
+                    <option value="pembagian">aᵐ ÷ aⁿ = aᵐ⁻ⁿ</option>
+                    <option value="pangkat-pangkat">(aᵐ)ⁿ = aᵐⁿ</option>
+                    <option value="perkalian-dalam">(a × b)ⁿ = aⁿ × bⁿ</option>
+                    <option value="nol">a⁰ = 1  (a ≠ 0)</option>
+                    <option value="negatif">a⁻ⁿ = 1 / aⁿ</option>
+                    <option value="campuran">Operasi Campuran</option>
+                </select>
+                <select class="tag select-tag" id="soalSelect">
+                  <option value="">PILIH SOAL</option>
+                  <option value="1">3² × 3⁴ = ?</option>
+                  <option value="2">2⁶ ÷ 2² = ?</option>
+                  <option value="3">(3²)³ = ?</option>
+                  <option value="4">(2 × 3)³ = ?</option>
+                  <option value="5">5⁰ = ?</option>
+                  <option value="6">2⁻² = ?</option>
+                  <option value="7">2² × 2³ ÷ 2⁴ = ?</option>
+                </select>
+            </div>
+            <div class="pocket-row"> 
+              <div class="pocket top-pocket"></div>
+              <span class="xsep">×</span>
+              <div class="pocket top-pocket"></div>
+              <span class="xsep">×</span>
+              <div class="pocket top-pocket"></div>
+              <span class="xsep">×</span>
+              <div class="pocket top-pocket"></div>
+              <span class="xsep">×</span>
+              <div class="pocket top-pocket"></div>
+              <span class="xsep">×</span>
+              <div class="pocket top-pocket"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hinge-bar" style="z-index:5;">
+        <div class="rivet"></div>
+        <div class="rivet"></div>
+      </div>
+
+      <div class="ob-bottom">
+        <div class="wood-panel wood">
+          <div class="ob-bottom-inner">
+            <div class="corner bl"></div>
+            <div class="corner br"></div>
+            <div class="pocket-row">
+              <div class="pocket bottom-pocket"></div>
+              <span class="xsep">÷</span>
+              <div class="pocket bottom-pocket"></div>
+              <span class="xsep">÷</span>
+              <div class="pocket bottom-pocket"></div>
+              <span class="xsep">÷</span>
+              <div class="pocket bottom-pocket"></div>
+              <span class="xsep">÷</span>
+              <div class="pocket bottom-pocket"></div>
+              <span class="xsep">÷</span>
+              <div class="pocket bottom-pocket"></div>
+            </div>
+            <div class="hasil-row">
+              <div class="hasil-tag" id="hasilBtn">HASIL</div>
+            </div>
+            <div class="bead-palette">
+                <div class="bead red" data-color="#d64545" draggable="true"></div>
+                <div class="bead blue" data-color="#3b82f6" draggable="true"></div>
+                <div class="bead green" data-color="#22c55e" draggable="true"></div>
+            </div>
+            <button class="btn-tutup" onclick="closeK()">✕ TUTUP</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="floor-shadow"></div>
+</div>
+<script src="pangkatopia.js"></script>
+</body>
+</html>
