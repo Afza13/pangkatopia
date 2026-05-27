@@ -836,6 +836,7 @@ body{
 
     <div class="pnav" id="pnav">
       <button class="nav-btn secondary" id="pprev" onclick="panduNav(-1)" style="font-size:0.78rem;padding:0.5rem 1.2rem;letter-spacing:1.5px;">&#8249; Sebelumnya</button>
+      <button class="nav-btn secondary" id="pback" onclick="goTo('page-intro')" style="font-size:0.78rem;padding:0.5rem 1.2rem;letter-spacing:1.5px;display:none;">&#8249; Kembali</button>
       <div class="pnavinfo" id="pinfo">1 / 9</div>
       <button class="nav-btn primary" id="pnext" onclick="panduNav(1)" style="font-size:0.78rem;padding:0.5rem 1.2rem;letter-spacing:1.5px;">Selanjutnya &#8250;</button>
     </div>
@@ -864,8 +865,9 @@ body{
         var t=document.getElementById('ptab-'+i);
         if(t) t.className='ptab'+(i===c?' on':i<c?' dn':'');
       }
-      var pp=document.getElementById('pprev'),pn=document.getElementById('pnext'),pi=document.getElementById('pinfo');
-      if(pp) pp.style.visibility=c===0?'hidden':'visible';
+      var pp=document.getElementById('pprev'),pn=document.getElementById('pnext'),pi=document.getElementById('pinfo'),pb=document.getElementById('pback');
+      if(pp) pp.style.display=c===0?'none':'inline-flex';
+      if(pb) pb.style.display=c===0?'inline-flex':'none';
       if(pn) pn.style.visibility=c===T-1?'hidden':'visible';
       if(pi) pi.textContent=(c+1)+' / '+T;
     }
