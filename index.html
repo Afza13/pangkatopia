@@ -3,763 +3,1062 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pangkatopia</title>
+<title>Pangkatopia 3D</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --wood-mid:#6b3515;--wood-edge:#2a1306;
-  --brass:#b8922a;--brass-dark:#7a5e18;
+  --wood-mid:#6b3515;--wood-edge:#2a1306;--brass:#b8922a;--brass-dark:#7a5e18;
   --label-bg:#f5ece0;--label-text:#3d1f0a;
   --pocket-bg:rgba(255,255,255,0.13);--pocket-border:rgba(255,255,255,0.45);
 }
 body{
-  min-height:100vh;display:flex;align-items:center;justify-content:center;
-  background:#1a1008;font-family:'Lato',sans-serif;overflow:hidden;
+  background:radial-gradient(ellipse at 40% 35%,#251408 0%,#080401 100%);
+  overflow:hidden;font-family:'Lato',sans-serif;user-select:none;min-height:100vh;
 }
-.dust{position:fixed;inset:0;pointer-events:none;z-index:0;}
-.dust span{
-  position:absolute;border-radius:50%;background:rgba(180,130,60,0.2);
-  animation:floatup linear infinite;
+
+/* ══════════════════════════════════
+   PAGE SYSTEM
+══════════════════════════════════ */
+.page{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  transition:opacity .55s ease, transform .55s ease;
+  z-index:300;
 }
-@keyframes floatup{
-  0%{transform:translateY(100%) scale(0);opacity:0}
-  10%{opacity:1}90%{opacity:0.5}
-  100%{transform:translateY(-30px) scale(1.5);opacity:0}
+.page.hidden{
+  opacity:0;pointer-events:none;transform:scale(0.96);
 }
-.stage{display:flex;flex-direction:column;align-items:center;position:relative;z-index:1;}
-.wood{
-  background-color:var(--wood-mid);
-  background-image:
-    repeating-linear-gradient(89deg,transparent 0,transparent 11px,rgba(0,0,0,0.09) 11px,rgba(0,0,0,0.09) 12px),
-    repeating-linear-gradient(91deg,transparent 0,transparent 26px,rgba(255,255,255,0.035) 26px,rgba(255,255,255,0.035) 28px);
+.page.active{
+  opacity:1;pointer-events:all;transform:scale(1);
 }
-.koper-wrap{width:600px;position:relative;}
-.handle{
-  position:absolute;top:-22px;left:50%;transform:translateX(-50%);
-  width:90px;height:22px;border:3px solid var(--brass-dark);border-bottom:none;border-radius:12px 12px 0 0;
+
+/* ── HALAMAN 1: INTRO ── */
+#page-intro{
+  background:radial-gradient(ellipse at 40% 35%,#251408 0%,#080401 100%);
+  gap:0;
 }
-.handle::before,.handle::after{
-  content:'';position:absolute;bottom:-5px;width:12px;height:10px;
-  background:var(--brass);border-radius:3px;border:2px solid var(--brass-dark);
+.intro-card{
+  background:rgba(30,14,4,0.82);
+  border:2px solid rgba(184,146,42,0.35);
+  border-radius:24px;
+  padding:2.8rem 4rem;
+  text-align:center;
+  box-shadow:0 8px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(184,146,42,0.1);
+  backdrop-filter:blur(12px);
+  max-width:520px;
+  width:90vw;
+  display:flex;flex-direction:column;align-items:center;gap:1.4rem;
 }
-.handle::before{left:-5px}.handle::after{right:-5px}
-.lid{
-  width:100%;transform-origin:bottom center;
-  transition:transform 0.85s cubic-bezier(0.4,0,0.15,1);
-  position:relative;z-index:3;border-radius:13px 13px 0 0;overflow:hidden;
-  box-shadow:0 -4px 20px rgba(0,0,0,0.55);
+.intro-ornament{
+  width:64px;height:3px;
+  background:linear-gradient(90deg,transparent,#b8922a,transparent);
+  border-radius:2px;
 }
-.lid-inner{
-  border:3px solid var(--wood-edge);border-bottom:2px solid var(--wood-edge);
-  border-radius:13px 13px 0 0;min-height:200px;position:relative;
+.intro-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.4rem,8vw,3.8rem);
+  font-weight:900;
+  color:#f5ece0;
+  letter-spacing:6px;
+  text-shadow:0 2px 0 #3d1f0a, 0 0 40px rgba(184,146,42,0.4);
+  line-height:1.1;
 }
-.base{
-  width:100%;transform-origin:top center;
-  transition:transform 0.85s cubic-bezier(0.4,0,0.15,1);
-  position:relative;z-index:3;border-radius:0 0 13px 13px;overflow:hidden;
-  box-shadow:0 14px 40px rgba(0,0,0,0.75);
+.intro-subtitle{
+  font-family:'Playfair Display',serif;
+  font-size:1rem;
+  color:#b8922a;
+  letter-spacing:3px;
+  font-weight:700;
 }
-.base-inner{
-  border:3px solid var(--wood-edge);border-top:none;
-  border-radius:0 0 13px 13px;min-height:160px;position:relative;
+.intro-divider{
+  width:100%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(184,146,42,0.4),transparent);
 }
-.corner{
-  position:absolute;width:20px;height:20px;background:var(--brass);border-radius:3px;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,0.4),0 1px 4px rgba(0,0,0,0.5);
+.intro-kelompok{
+  font-family:'Lato',sans-serif;
+  font-size:1.05rem;
+  font-weight:700;
+  color:#f5ece0;
+  letter-spacing:2px;
 }
+
+/* FIX: Dosen pengampu block - stacked properly, no overlap */
+.intro-dosen-block{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.45rem;
+  width:100%;
+}
+.intro-dosen-label{
+  font-family:'Lato',sans-serif;
+  font-size:0.72rem;
+  letter-spacing:3px;
+  color:rgba(184,146,42,0.7);
+  text-transform:uppercase;
+  line-height:1;
+}
+.intro-dosen{
+  font-family:'Playfair Display',serif;
+  font-size:0.95rem;
+  color:rgba(245,236,224,0.82);
+  font-style:italic;
+  letter-spacing:0.5px;
+  line-height:1.5;
+}
+
+/* ── HALAMAN 2: PANDUAN ── */
+#page-panduan{
+  background:radial-gradient(ellipse at 40% 35%,#251408 0%,#080401 100%);
+  overflow-y:auto;
+  padding:1.5rem 1rem;
+  /* FIX: ensure page can scroll and title not clipped */
+  align-items:center;
+  justify-content:flex-start;
+}
+.panduan-card{
+  background:rgba(30,14,4,0.85);
+  border:2px solid rgba(184,146,42,0.35);
+  border-radius:20px;
+  /* FIX: more top padding so title is never clipped */
+  padding:2.8rem 2.8rem 2.4rem;
+  max-width:620px;
+  width:92vw;
+  box-shadow:0 8px 60px rgba(0,0,0,0.7);
+  backdrop-filter:blur(12px);
+  display:flex;flex-direction:column;gap:1.3rem;
+  margin:auto;
+  /* FIX: allow the card to scroll within the page */
+  overflow:visible;
+}
+.panduan-title{
+  font-family:'Playfair Display',serif;
+  font-size:1.6rem;font-weight:900;
+  color:#f5ece0;letter-spacing:5px;
+  text-align:center;
+  text-shadow:0 2px 0 #3d1f0a;
+  /* FIX: ensure title has enough room */
+  padding-top:0.3rem;
+  line-height:1.3;
+}
+.panduan-title span{
+  color:#b8922a;
+}
+.panduan-divider{
+  width:100%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(184,146,42,0.45),transparent);
+}
+.panduan-section{
+  display:flex;flex-direction:column;gap:0.6rem;
+}
+.panduan-section-title{
+  font-family:'Playfair Display',serif;
+  font-size:0.95rem;font-weight:700;
+  color:#b8922a;letter-spacing:2px;
+  text-transform:uppercase;
+  display:flex;align-items:center;gap:0.5rem;
+}
+.panduan-section-title::before{
+  content:'';display:inline-block;
+  width:18px;height:2px;
+  background:#b8922a;border-radius:2px;flex-shrink:0;
+}
+.panduan-item{
+  display:flex;align-items:flex-start;gap:0.7rem;
+  font-family:'Lato',sans-serif;font-size:0.88rem;
+  color:rgba(245,236,224,0.82);line-height:1.6;
+}
+.panduan-num{
+  flex-shrink:0;width:22px;height:22px;
+  background:#b8922a;color:#1a0a00;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:0.72rem;font-weight:700;margin-top:1px;
+}
+.panduan-bead-row{
+  display:flex;gap:0.6rem;align-items:center;margin-top:0.2rem;
+}
+.pb{width:14px;height:14px;border-radius:50%;display:inline-block;
+  border:1.5px solid rgba(255,255,255,0.3);
+  box-shadow:inset 0 1px 3px rgba(255,255,255,0.3);}
+.pb.r{background:#d64545;}.pb.b{background:#3b82f6;}.pb.g{background:#22c55e;}
+.panduan-note{
+  font-family:'Lato',sans-serif;font-size:0.8rem;
+  color:rgba(184,146,42,0.75);
+  background:rgba(184,146,42,0.08);
+  border:1px solid rgba(184,146,42,0.2);
+  border-radius:8px;padding:0.65rem 0.9rem;
+  line-height:1.6;
+  font-style:italic;
+}
+/* Tabel panduan */
+.panduan-table{
+  width:100%;border-collapse:collapse;
+  font-family:'Lato',sans-serif;font-size:0.82rem;
+  color:rgba(245,236,224,0.88);
+}
+.panduan-table thead tr{
+  background:rgba(184,146,42,0.28);
+}
+.panduan-table thead th{
+  padding:7px 10px;text-align:left;
+  font-weight:700;letter-spacing:1.5px;
+  font-size:0.78rem;color:#f5ece0;
+  border-bottom:2px solid rgba(184,146,42,0.5);
+}
+.panduan-table thead th:first-child{width:36px;text-align:center;}
+.panduan-table tbody tr{border-bottom:1px solid rgba(255,255,255,0.07);}
+.panduan-table tbody tr:last-child{border-bottom:none;}
+.panduan-table tbody td{padding:7px 10px;vertical-align:top;line-height:1.55;}
+.panduan-table tbody td:first-child{text-align:center;font-weight:700;color:#b8922a;width:36px;}
+/* Aturan box */
+.panduan-text{
+  font-family:'Lato',sans-serif;font-size:0.84rem;
+  color:rgba(245,236,224,0.78);line-height:1.6;margin-bottom:0.6rem;
+}
+.panduan-aturan-box{
+  border:1.5px solid rgba(184,146,42,0.45);
+  border-radius:8px;padding:1rem 1.1rem;
+  background:rgba(184,146,42,0.07);
+}
+.panduan-aturan-title{
+  font-family:'Lato',sans-serif;font-size:0.78rem;
+  font-weight:700;letter-spacing:2.5px;
+  color:#f5ece0;text-align:center;
+  margin-bottom:0.65rem;
+}
+.panduan-aturan-body{
+  font-family:'Lato',sans-serif;font-size:0.82rem;
+  color:rgba(245,236,224,0.82);line-height:1.65;
+}
+/* Alur sub-heading & list */
+.panduan-alur-sub{
+  font-family:'Lato',sans-serif;font-size:0.85rem;
+  font-weight:700;color:#b8922a;
+  letter-spacing:0.5px;margin:0.7rem 0 0.35rem;
+}
+.panduan-list{
+  list-style:none;padding:0;margin:0;
+  display:flex;flex-direction:column;gap:0.35rem;
+}
+.panduan-list li{
+  font-family:'Lato',sans-serif;font-size:0.82rem;
+  color:rgba(245,236,224,0.82);line-height:1.55;
+  padding-left:1.1rem;position:relative;
+}
+.panduan-list li::before{
+  content:'•';position:absolute;left:0;
+  color:#b8922a;font-weight:700;
+}
+
+/* ── TOMBOL NAVIGASI ── */
+.nav-btn{
+  font-family:'Playfair Display',serif;
+  font-size:0.95rem;font-weight:700;letter-spacing:3px;
+  padding:0.75rem 2.4rem;border-radius:50px;
+  border:2px solid #b8922a;
+  cursor:pointer;transition:all .22s;
+  display:inline-flex;align-items:center;gap:0.6rem;
+  white-space:nowrap;
+}
+.nav-btn.primary{
+  background:linear-gradient(135deg,#b8922a,#7a5e18);
+  color:#f5ece0;
+  box-shadow:0 4px 20px rgba(184,146,42,0.35);
+}
+.nav-btn.primary:hover{
+  background:linear-gradient(135deg,#d4aa38,#9a7828);
+  box-shadow:0 6px 28px rgba(184,146,42,0.5);
+  transform:translateY(-2px);
+}
+.nav-btn.secondary{
+  background:transparent;
+  color:#b8922a;
+}
+.nav-btn.secondary:hover{
+  background:rgba(184,146,42,0.1);
+  transform:translateY(-2px);
+}
+.nav-btn:active{transform:translateY(0) scale(0.97);}
+.btn-row{display:flex;gap:1rem;justify-content:center;align-items:center;flex-wrap:wrap;}
+
+/* ── TOMBOL KEMBALI DI HALAMAN GAME ── */
+#btn-back-game{
+  position:fixed;
+  bottom:18px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:1000;
+  font-family:'Playfair Display',serif;
+  font-size:0.78rem;
+  font-weight:700;
+  letter-spacing:2.5px;
+  padding:0.5rem 1.6rem;
+  border-radius:50px;
+  border:1.5px solid rgba(184,146,42,0.55);
+  background:rgba(26,10,2,0.88);
+  color:rgba(184,146,42,0.9);
+  cursor:pointer;
+  backdrop-filter:blur(10px);
+  box-shadow:0 2px 16px rgba(0,0,0,0.7);
+  transition:all .22s;
+  display:none;
+  white-space:nowrap;
+}
+#btn-back-game:hover{
+  background:rgba(184,146,42,0.18);
+  border-color:#b8922a;
+  color:#f5ece0;
+  transform:translateX(-50%) translateY(-2px);
+  box-shadow:0 4px 22px rgba(184,146,42,0.35);
+}
+#btn-back-game:active{
+  transform:translateX(-50%) scale(0.97);
+}
+
+#c{position:fixed;inset:0;display:block;width:100vw!important;height:100vh!important;}
+#c.grab{cursor:grab;}#c.drag{cursor:grabbing;}
+#ctrl{
+  position:fixed;top:14px;left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:8px;
+  background:rgba(26,16,8,0.92);border:1px solid rgba(184,146,42,0.4);
+  border-radius:30px;padding:7px 18px;z-index:999;
+  backdrop-filter:blur(12px);box-shadow:0 4px 24px rgba(0,0,0,0.9);
+}
+#ctrl label{font-size:10px;letter-spacing:2.5px;color:rgba(245,236,224,0.4);}
+.cb{background:rgba(184,146,42,0.15);border:1px solid rgba(184,146,42,0.4);color:#f5ece0;
+  border-radius:8px;cursor:pointer;font-size:14px;width:32px;height:32px;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.cb:hover{background:rgba(184,146,42,0.35);}
+.cb:active{transform:scale(0.88);}
+#cbReset{width:auto;padding:0 14px;font-size:10px;letter-spacing:2px;}
+.csep{width:1px;height:20px;background:rgba(255,255,255,0.1);}
+#boardWrap{
+  position:fixed;top:0;left:0;
+  width:600px;height:372px;
+  transform-origin:0 0;
+  pointer-events:none;z-index:50;display:none;
+  will-change:transform;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  overflow:hidden;
+}
+#boardWrap.vis{display:block;}
+.wood{background-color:var(--wood-mid);background-image:
+  repeating-linear-gradient(89deg,transparent 0,transparent 11px,rgba(0,0,0,0.09) 11px,rgba(0,0,0,0.09) 12px),
+  repeating-linear-gradient(91deg,transparent 0,transparent 26px,rgba(255,255,255,0.035) 26px,rgba(255,255,255,0.035) 28px);}
+.corner{position:absolute;width:20px;height:20px;background:var(--brass);border-radius:3px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.4),0 1px 4px rgba(0,0,0,0.5);}
 .corner.tl{top:7px;left:7px}.corner.tr{top:7px;right:7px}
 .corner.bl{bottom:7px;left:7px}.corner.br{bottom:7px;right:7px}
-.hinge-bar{
-  width:100%;height:14px;
+.hinge-bar-b{width:100%;height:14px;
   background:linear-gradient(180deg,var(--brass) 0%,var(--brass-dark) 100%);
   border-left:3px solid var(--wood-edge);border-right:3px solid var(--wood-edge);
-  display:flex;align-items:center;justify-content:center;gap:36px;
-  z-index:4;position:relative;
-  box-shadow:0 2px 8px rgba(0,0,0,0.5),0 -1px 0 rgba(255,255,255,0.15);
-}
-.rivet{
-  width:9px;height:9px;border-radius:50%;
-  background:radial-gradient(circle at 35% 35%,#e8c45a,#7a5e18);
-  box-shadow:0 1px 3px rgba(0,0,0,0.5);
-}
-.btn-buka{
-  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  background:var(--label-bg);color:var(--label-text);
-  border:2px solid var(--brass);font-family:'Playfair Display',serif;
-  font-size:12px;font-weight:700;letter-spacing:3px;padding:6px 22px;
-  cursor:pointer;border-radius:3px;
-  box-shadow:0 2px 10px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.5);
-  transition:transform 0.15s,opacity 0.3s;z-index:10;white-space:nowrap;
-}
-.btn-buka:hover{transform:translate(-50%,-50%) scale(1.07);}
-.open-board{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  opacity:0;pointer-events:none;transition:opacity 0.4s ease 0.65s;z-index:2;
-}
-.open-board.visible{opacity:1;pointer-events:all;}
+  display:flex;align-items:center;justify-content:center;gap:36px;z-index:4;position:relative;
+  box-shadow:0 2px 8px rgba(0,0,0,0.5),0 -1px 0 rgba(255,255,255,0.15);}
+.rivet{width:9px;height:9px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#e8c45a,#7a5e18);box-shadow:0 1px 3px rgba(0,0,0,0.5);}
+.open-board{display:flex;flex-direction:column;width:100%;height:100%;}
 .ob-top,.ob-bottom{flex:1;display:flex;flex-direction:column;}
-.ob-top-inner,.ob-bottom-inner{
-  flex:1;display:flex;flex-direction:column;gap:10px;padding:14px 18px 18px;position:relative;
-}
+.ob-top-inner,.ob-bottom-inner{flex:1;display:flex;flex-direction:column;gap:10px;padding:14px 18px 18px;position:relative;}
 .wood-panel{flex:1;display:flex;flex-direction:column;}
 .ob-top .wood-panel{border:3px solid var(--wood-edge);border-bottom:none;border-radius:13px 13px 0 0;}
 .ob-bottom .wood-panel{border:3px solid var(--wood-edge);border-top:none;border-radius:0 0 13px 13px;}
-.board-title{
-  font-family:'Playfair Display',serif;font-size:22px;font-weight:900;letter-spacing:5px;
-  color:var(--label-bg);text-align:center;align-self:center;
-  padding:6px 30px;background:rgba(0,0,0,0.22);
-  border:1.5px solid rgba(255,255,255,0.15);border-radius:5px;
-  text-shadow:0 1px 0 rgba(0,0,0,0.6);
-}
+.board-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;letter-spacing:5px;
+  color:var(--label-bg);text-align:center;align-self:center;padding:6px 30px;
+  background:rgba(0,0,0,0.22);border:1.5px solid rgba(255,255,255,0.15);border-radius:5px;
+  text-shadow:0 1px 0 rgba(0,0,0,0.6);}
 .lbl-row{display:flex;justify-content:space-between;align-items:center;padding:0 2px;}
-.tag{
-  background:var(--label-bg);color:var(--label-text);
-  font-family:'Lato',sans-serif;font-size:14px;font-weight:700;letter-spacing:2.5px;
-  padding:4px 14px;border:2px solid var(--brass);border-radius:3px;
+.tag{background:var(--label-bg);color:var(--label-text);font-family:'Lato',sans-serif;
+  font-size:14px;font-weight:700;letter-spacing:2.5px;padding:4px 14px;
+  border:2px solid var(--brass);border-radius:3px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.5);}
+.select-tag{appearance:none;cursor:pointer;outline:none;min-width:180px;text-align:center;pointer-events:all;}
+.soal-display{background:var(--label-bg);color:var(--label-text);font-family:'Lato',sans-serif;
+  font-size:14px;font-weight:700;letter-spacing:2.5px;padding:4px 14px;
+  border:2px solid var(--brass);border-radius:3px;
   box-shadow:0 2px 6px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.5);
-}
-.select-tag{
-  appearance:none;
-  cursor:pointer;
-  outline:none;
-  min-width:180px;
-  text-align:center;
-}
+  min-width:170px;text-align:center;opacity:0.45;transition:opacity 0.3s;white-space:nowrap;}
+.soal-display.aktif{opacity:1;}
 .pocket-row{display:flex;align-items:center;justify-content:center;}
-.pocket{
-  flex:1;
-  min-width:72px;
-  height:64px;
-  background:var(--pocket-bg);
-  border:1.5px solid var(--pocket-border);
-  border-radius:7px;
-  margin:0 4px;
-  box-shadow:inset 0 2px 8px rgba(0,0,0,0.28);
-  position:relative;
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  justify-content:center;
-  gap:4px;
-  padding:4px;
-
-}
-.pocket::before{
-  content:'';position:absolute;inset:5px;
-  border:1px solid rgba(255,255,255,0.1);border-radius:4px;
-}
-.xsep{
-  color:rgba(255,255,255,0.38);font-size:13px;font-weight:700;
-  flex-shrink:0;text-shadow:0 1px 2px rgba(0,0,0,0.5);width:14px;text-align:center;
-}
+.pocket{flex:1;min-width:60px;height:60px;background:var(--pocket-bg);
+  border:1.5px solid var(--pocket-border);border-radius:7px;margin:0 3px;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,0.28);position:relative;
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px;padding:4px;
+  transition:border-color 0.15s,box-shadow 0.15s;pointer-events:all;}
+.pocket::before{content:'';position:absolute;inset:5px;
+  border:1px solid rgba(255,255,255,0.1);border-radius:4px;pointer-events:none;}
+.pocket.drop-ok{border-color:rgba(255,215,80,0.9);box-shadow:inset 0 2px 8px rgba(0,0,0,0.28),0 0 12px rgba(255,200,50,0.45);}
+.pocket.drop-no{border-color:rgba(255,80,80,0.8);box-shadow:inset 0 2px 8px rgba(0,0,0,0.28),0 0 10px rgba(255,60,60,0.35);}
+.xsep{color:rgba(255,255,255,0.38);font-size:13px;font-weight:700;
+  flex-shrink:0;text-shadow:0 1px 2px rgba(0,0,0,0.5);width:14px;text-align:center;}
 .hasil-row{display:flex;justify-content:center;}
-.hasil-tag{
-  background:var(--label-bg);color:var(--label-text);
-  font-family:'Lato',sans-serif;font-size:14px;font-weight:700;letter-spacing:2.5px;
-  padding:4px 24px;border:2px solid var(--brass);border-radius:3px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.3);
-}
-.btn-tutup{
-  position:absolute;bottom:9px;right:14px;
-  background:rgba(0,0,0,0.22);color:rgba(255,255,255,0.55);
-  border:1px solid rgba(255,255,255,0.18);
+.hasil-tag{background:var(--label-bg);color:var(--label-text);font-family:'Lato',sans-serif;
+  font-size:14px;font-weight:700;letter-spacing:2.5px;padding:4px 24px;
+  border:2px solid var(--brass);border-radius:3px;box-shadow:0 2px 6px rgba(0,0,0,0.3);
+  transition:background 0.35s,color 0.35s,border-color 0.35s,transform 0.2s;
+  min-width:120px;text-align:center;position:relative;overflow:hidden;}
+.hasil-tag.benar{background:#22c55e;color:#fff;border-color:#16a34a;
+  transform:scale(1.06);box-shadow:0 4px 16px rgba(34,197,94,0.5);}
+.hasil-tag.salah{background:#ef4444;color:#fff;border-color:#dc2626;animation:shake 0.4s;}
+.hasil-tag .countdown-bar{position:absolute;bottom:0;left:0;height:3px;
+  background:var(--brass);border-radius:0 0 3px 3px;width:100%;transform-origin:left;}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.btn-tutup{position:absolute;bottom:9px;right:14px;background:rgba(0,0,0,0.22);
+  color:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.18);
   font-family:'Lato',sans-serif;font-size:9px;letter-spacing:2px;
-  padding:3px 10px;cursor:pointer;border-radius:3px;transition:all 0.2s;
-}
+  padding:3px 10px;cursor:pointer;border-radius:3px;transition:all 0.2s;pointer-events:all;}
 .btn-tutup:hover{background:rgba(0,0,0,0.4);color:#fff;}
-
-.bead-palette{
-  position:absolute;
-  right:90px;
-  bottom:8px;
-
-  display:flex;
-  gap:8px;
-  align-items:center;
-
-  padding:6px 10px;
-
-  background:rgba(0,0,0,0.18);
-  border:1px solid rgba(255,255,255,0.15);
-  border-radius:8px;
-
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.08),
-    0 2px 8px rgba(0,0,0,0.35);
-}
-
-.bead{
-  width:22px;
-  height:22px;
-  border-radius:50%;
-
-  cursor:pointer;
-
+.bead-palette{position:absolute;right:90px;bottom:8px;display:flex;gap:8px;align-items:center;
+  padding:6px 10px;background:rgba(0,0,0,0.18);border:1px solid rgba(255,255,255,0.15);
+  border-radius:8px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.08),0 2px 8px rgba(0,0,0,0.35);}
+.bead{width:22px;height:22px;border-radius:50%;cursor:grab;
   border:2px solid rgba(255,255,255,0.35);
-
-  box-shadow:
-    inset 0 2px 4px rgba(255,255,255,0.4),
-    inset 0 -3px 6px rgba(0,0,0,0.35),
-    0 2px 5px rgba(0,0,0,0.4);
-
-  transition:
-    transform 0.15s,
-    box-shadow 0.15s;
-}
-
-.bead:hover{
-  transform:scale(1.15);
-
-  box-shadow:
-    inset 0 2px 4px rgba(255,255,255,0.5),
-    inset 0 -3px 6px rgba(0,0,0,0.4),
-    0 0 10px rgba(255,255,255,0.25);
-}
-
-.red{background:#d64545;}
-.blue{background:#3b82f6;}
-.green{background:#22c55e;}
-.yellow{background:#eab308;}
-.purple{background:#a855f7;}
-.orange{background:#f97316;}
-
-.koper-wrap.opened .lid{transform:translateY(-110%) rotateX(-4deg);}
-.koper-wrap.opened .base{transform:translateY(110%) rotateX(4deg);}
-.koper-wrap.opened .btn-buka{opacity:0;pointer-events:none;}
-
-.floor-shadow{
-  width:560px;height:18px;margin-top:-2px;
-  background:radial-gradient(ellipse,rgba(0,0,0,0.65) 0%,transparent 70%);
-  transition:width 0.85s,opacity 0.85s;
-}
-.koper-wrap.opened~.floor-shadow{width:160px;opacity:0.2;}
-.filled-bead{
-  width:12px;
-  height:12px;
-
-  border-radius:50%;
-
-  margin:auto;
-  margin-top:8px;
-
-  box-shadow:
-    inset 0 2px 4px rgba(255,255,255,0.45),
-    inset 0 -3px 6px rgba(0,0,0,0.35),
-    0 2px 5px rgba(0,0,0,0.35);
-
-  border:2px solid rgba(0,0,0,0.25);
-}
-#jawabanOutput{
-
-  margin-top:10px;
-
-  text-align:center;
-
-  color:white;
-
-  font-size:18px;
-
-  font-weight:bold;
-
-  letter-spacing:2px;
-
-}
-.bead{
-  cursor:grab;
-}
-
-.bead:active{
-  cursor:grabbing;
-}
+  box-shadow:inset 0 2px 4px rgba(255,255,255,0.4),inset 0 -3px 6px rgba(0,0,0,0.35),0 2px 5px rgba(0,0,0,0.4);
+  transition:transform 0.15s;pointer-events:all;}
+.bead:hover{transform:scale(1.15);}
+.red{background:#d64545;}.blue{background:#3b82f6;}.green{background:#22c55e;}
+.filled-bead{width:12px;height:12px;border-radius:50%;
+  box-shadow:inset 0 2px 4px rgba(255,255,255,0.45),inset 0 -3px 6px rgba(0,0,0,0.35),0 2px 5px rgba(0,0,0,0.35);
+  border:2px solid rgba(0,0,0,0.25);cursor:grab;transition:transform 0.12s;pointer-events:all;}
+.filled-bead:hover{transform:scale(1.25);}
+#ghost{position:fixed;pointer-events:none;z-index:9999;width:16px;height:16px;border-radius:50%;
+  border:2px solid rgba(255,255,255,0.55);
+  box-shadow:inset 0 2px 4px rgba(255,255,255,0.5),0 4px 14px rgba(0,0,0,0.65);
+  transform:translate(-50%,-50%);display:none;}
+#hint{position:fixed;bottom:50px;left:50%;transform:translateX(-50%);
+  font-size:10px;letter-spacing:2px;color:rgba(245,220,140,0.28);pointer-events:none;
+  animation:fh 4s ease 3.5s forwards;}
+@keyframes fh{to{opacity:0;}}
 </style>
 </head>
 <body>
 
-<div class="dust" id="dust"></div>
+<!-- ══════════════════════════════════
+     HALAMAN 1 — INTRO
+══════════════════════════════════ -->
+<div class="page active" id="page-intro">
+  <div class="intro-card">
+    <div class="intro-ornament"></div>
+    <div>
+      <div class="intro-subtitle">Media Pembelajaran</div>
+      <div class="intro-title">PANGKATOPIA</div>
+    </div>
+    <div class="intro-divider"></div>
+    <div class="intro-kelompok">Kelompok 1 &nbsp;·&nbsp; Kelas A</div>
+    <!-- FIX: Dosen block now uses flex column so label and name don't overlap -->
+    <div class="intro-dosen-block">
+      <div class="intro-dosen-label">Dosen Pengampu</div>
+      <div class="intro-dosen">Ervin Oktavianingtyas, S.Pd., M.Pd.</div>
+    </div>
+    <div class="intro-divider"></div>
+    <button class="nav-btn primary" onclick="goTo('page-panduan')">
+      Lihat Panduan &nbsp;›
+    </button>
+  </div>
+</div>
 
-<div class="stage">
-  <div class="koper-wrap" id="kw">
+<!-- ══════════════════════════════════
+     HALAMAN 2 — BUKU PANDUAN
+══════════════════════════════════ -->
+<div class="page hidden" id="page-panduan">
+  <div style="width:100%;height:100%;overflow-y:auto;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem;">
+    <div class="panduan-card">
+      <div class="panduan-title">BUKU <span>PANDUAN</span></div>
+      <div class="panduan-divider"></div>
 
-    <div class="handle"></div>
-
-    <!-- LID: bersih -->
-    <div class="lid">
-      <div class="lid-inner wood">
-        <div class="corner tl"></div>
-        <div class="corner tr"></div>
-        <div class="corner bl"></div>
-        <div class="corner br"></div>
+      <!-- 1 -->
+      <div class="panduan-section">
+        <div class="panduan-section-title">1 Persiapan Sebelum Pembelajaran</div>
+        <table class="panduan-table">
+          <thead><tr><th>No.</th><th>Langkah Persiapan</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Siapkan papan Pangkatopia di atas meja yang dapat dijangkau seluruh siswa atau kelompok.</td></tr>
+            <tr><td>2</td><td>Pastikan semua kantong plastik pada papan terpasang dengan rapi pada dua baris (baris atas dan baris bawah).</td></tr>
+            <tr><td>3</td><td>Siapkan manik-manik dalam wadah penyimpan.</td></tr>
+            <tr><td>4</td><td>Pasang kartu soal di tempat yang tersedia pada papan.</td></tr>
+            <tr><td>5</td><td>Pastikan jumlah manik mencukupi untuk semua contoh soal yang akan diperagakan.</td></tr>
+          </tbody>
+        </table>
       </div>
-    </div>
 
-    <!-- HINGE + BUKA -->
-    <div class="hinge-bar">
-      <div class="rivet"></div>
-      <button class="btn-buka" onclick="openK()">BUKA</button>
-      <div class="rivet"></div>
-    </div>
+      <div class="panduan-divider"></div>
 
-    <!-- BASE: bersih -->
-    <div class="base">
-      <div class="base-inner wood">
-        <div class="corner bl"></div>
-        <div class="corner br"></div>
-      </div>
-    </div>
-
-    <!-- OPEN BOARD -->
-    <div class="open-board" id="ob">
-
-      <div class="ob-top">
-        <div class="wood-panel wood">
-          <div class="ob-top-inner">
-            <div class="corner tl"></div>
-            <div class="corner tr"></div>
-            <div class="board-title">PANGKATOPIA</div>
-            <div class="lbl-row">
-                <select class="tag select-tag" id="sifatSelect">
-                    <option value="">SIFAT</option> 
-                    <option value="perkalian">aᵐ × aⁿ = aᵐ⁺ⁿ</option>
-                    <option value="pembagian">aᵐ ÷ aⁿ = aᵐ⁻ⁿ</option>
-                    <option value="pangkat-pangkat">(aᵐ)ⁿ = aᵐⁿ</option>
-                    <option value="perkalian-dalam">(a × b)ⁿ = aⁿ × bⁿ</option>
-                    <option value="nol">a⁰ = 1  (a ≠ 0)</option>
-                    <option value="negatif">a⁻ⁿ = 1 / aⁿ</option>
-                    <option value="campuran">Operasi Campuran</option>
-                </select>
-                <select class="tag select-tag" id="soalSelect">
-                  <option value="">PILIH SOAL</option>
-                  <option value="1">3² × 3⁴ = ?</option>
-                  <option value="2">2⁶ ÷ 2² = ?</option>
-                  <option value="3">(3²)³ = ?</option>
-                  <option value="4">(2 × 3)³ = ?</option>
-                  <option value="5">5⁰ = ?</option>
-                  <option value="6">2⁻² = ?</option>
-                  <option value="7">2² × 2³ ÷ 2⁴ = ?</option>
-                </select>
-            </div>
-            <div class="pocket-row"> 
-              <div class="pocket top-pocket"></div>
-              <span class="xsep">×</span>
-              <div class="pocket top-pocket"></div>
-              <span class="xsep">×</span>
-              <div class="pocket top-pocket"></div>
-              <span class="xsep">×</span>
-              <div class="pocket top-pocket"></div>
-              <span class="xsep">×</span>
-              <div class="pocket top-pocket"></div>
-              <span class="xsep">×</span>
-              <div class="pocket top-pocket"></div>
-            </div>
-          </div>
+      <!-- 2 -->
+      <div class="panduan-section">
+        <div class="panduan-section-title">2 Aturan Penggunaan Alat Peraga</div>
+        <p class="panduan-text">Berikut adalah satu aturan utama dalam penggunaan alat peraga Pangkatopia yang wajib dipahami oleh guru maupun siswa:</p>
+        <div class="panduan-aturan-box">
+          <div class="panduan-aturan-title">ATURAN PENGGUNAAN ALAT PERAGA</div>
+          <p class="panduan-aturan-body">Setiap manik mewakili satu satuan bilangan pokok (basis). Manik warna Biru mewakili variabel &lsquo;a&rsquo; dan manik warna Pink mewakili variabel &lsquo;b&rsquo;. Setiap kantong mewakili satu faktor perkalian (satu kelompok). Baris kantong atas merepresentasikan pembilang, sedangkan baris kantong bawah merepresentasikan penyebut. Proses manipulasi manik (memasukkan, memindahkan, memasangkan, atau mengeluarkan manik) mencerminkan operasi perpangkatan yang sedang dipelajari.</p>
         </div>
       </div>
 
-      <div class="hinge-bar" style="z-index:5;">
-        <div class="rivet"></div>
-        <div class="rivet"></div>
+      <div class="panduan-divider"></div>
+
+      <!-- 3 -->
+      <div class="panduan-section">
+        <div class="panduan-section-title">3 Peran Guru dan Siswa</div>
+        <table class="panduan-table">
+          <thead><tr><th>Peran Guru</th><th>Peran Siswa</th></tr></thead>
+          <tbody>
+            <tr><td>Memberikan contoh soal secara bertahap</td><td>Menyiapkan manik sesuai instruksi guru</td></tr>
+            <tr><td>Membimbing proses manipulasi manik</td><td>Memasukkan manik ke dalam kantong</td></tr>
+            <tr><td>Mengarahkan kesimpulan konsep</td><td>Memindahkan, mengelompokkan, atau menghitung manik</td></tr>
+            <tr><td>Memastikan pemahaman konsep setiap sifat</td><td>Menyimpulkan hasil manipulasi dalam notasi matematika</td></tr>
+            <tr><td>Memberikan latihan soal mandiri/kelompok</td><td>Mendiskusikan hasil dan mempresentasikan temuan</td></tr>
+          </tbody>
+        </table>
       </div>
 
-      <div class="ob-bottom">
-        <div class="wood-panel wood">
-          <div class="ob-bottom-inner">
-            <div class="corner bl"></div>
-            <div class="corner br"></div>
-            <div class="pocket-row">
-              <div class="pocket bottom-pocket"></div>
-              <span class="xsep">÷</span>
-              <div class="pocket bottom-pocket"></div>
-              <span class="xsep">÷</span>
-              <div class="pocket bottom-pocket"></div>
-              <span class="xsep">÷</span>
-              <div class="pocket bottom-pocket"></div>
-              <span class="xsep">÷</span>
-              <div class="pocket bottom-pocket"></div>
-              <span class="xsep">÷</span>
-              <div class="pocket bottom-pocket"></div>
-            </div>
-            <div class="hasil-row">
-              <div class="hasil-tag" id="hasilBtn">HASIL</div>
-            </div>
-            <div class="bead-palette">
-                <div class="bead red" data-color="#d64545" draggable="true"></div>
-                <div class="bead blue" data-color="#3b82f6" draggable="true"></div>
-                <div class="bead green" data-color="#22c55e" draggable="true"></div>
-            </div>
-            <button class="btn-tutup" onclick="closeK()">✕ TUTUP</button>
-          </div>
-        </div>
+      <div class="panduan-divider"></div>
+
+      <!-- 4 -->
+      <div class="panduan-section">
+        <div class="panduan-section-title">4 Alur Pembelajaran dengan Pangkatopia</div>
+
+        <div class="panduan-alur-sub">A. Pendahuluan (10 menit)</div>
+        <ul class="panduan-list">
+          <li>Guru memperkenalkan alat peraga dan menjelaskan cara kerja singkat.</li>
+          <li>Guru membagi siswa dalam kelompok (3&ndash;4 orang per kelompok) jika diperlukan.</li>
+        </ul>
+
+        <div class="panduan-alur-sub">B. Kegiatan Inti (65&ndash;70 menit)</div>
+        <ul class="panduan-list">
+          <li>Guru menyajikan satu soal perpangkatan per sesi dengan menggunakan alat peraga.</li>
+          <li>Siswa diminta mencari sifat eksponen yang sesuai dengan soal tersebut.</li>
+          <li>Siswa mengikuti langkah-langkah manipulasi manik sesuai panduan di BAB IV.</li>
+          <li>Siswa menghubungkan hasil konkret dengan notasi simbolik (rumus).</li>
+        </ul>
+
+        <div class="panduan-alur-sub">C. Evaluasi dan Penutup (15 menit)</div>
+        <ul class="panduan-list">
+          <li>Siswa mengerjakan latihan soal menggunakan media.</li>
+          <li>Siswa menyimpulkan hubungan antara model konkret dan bentuk simbolik.</li>
+          <li>Guru melakukan refleksi untuk memastikan pemahaman konsep.</li>
+        </ul>
       </div>
 
+      <div class="panduan-divider"></div>
+
+      <div class="btn-row">
+        <button class="nav-btn secondary" onclick="goTo('page-intro')">&#8249; &nbsp;Kembali</button>
+        <button class="nav-btn primary" onclick="goTo('page-game')">Mulai Bermain &nbsp;&#8250;</button>
+      </div>
     </div>
   </div>
-  <div class="floor-shadow"></div>
 </div>
+<!-- ══════════════════════════════════
+     HALAMAN 3 — GAME
+══════════════════════════════════ -->
+<div class="page hidden" id="page-game" style="z-index:0;pointer-events:none;">
+</div>
+
+<!-- Elemen game di luar page div agar Three.js & fixed elements tetap bekerja -->
+<canvas id="c" class="grab"></canvas>
+<div id="ctrl">
+  <label>PUTAR</label><div class="csep"></div>
+  <button class="cb" id="cbIn">＋</button>
+  <button class="cb" id="cbOut">－</button>
+  <div class="csep"></div>
+  <button class="cb" id="cbReset">↺ RESET</button>
+</div>
+<div id="hint">🖱 Seret untuk memutar · Scroll untuk zoom</div>
+<div id="ghost"></div>
+
+<!-- FIX: Tombol kembali di halaman game -->
+<button id="btn-back-game" onclick="backFromGame()">‹ &nbsp;Kembali</button>
+
+<div id="boardWrap">
+  <div class="open-board" id="ob">
+    <div class="ob-top">
+      <div class="wood-panel wood">
+        <div class="ob-top-inner">
+          <div class="corner tl"></div><div class="corner tr"></div>
+          <div class="board-title">PANGKATOPIA</div>
+          <div class="lbl-row">
+            <select class="tag select-tag" id="sifatSelect">
+              <option value="">SIFAT</option>
+              <option value="perkalian">aᵐ × aⁿ = aᵐ⁺ⁿ</option>
+              <option value="pembagian">aᵐ ÷ aⁿ = aᵐ⁻ⁿ</option>
+              <option value="pangkat-pangkat">(aᵐ)ⁿ = aᵐⁿ</option>
+              <option value="perkalian-dalam">(a × b)ⁿ = aⁿ × bⁿ</option>
+              <option value="nol">a⁰ = 1  (a ≠ 0)</option>
+              <option value="negatif">a⁻ⁿ = 1 / aⁿ</option>
+              <option value="campuran">Operasi Campuran</option>
+            </select>
+            <div class="soal-display" id="soalDisplay">PILIH SOAL</div>
+          </div>
+          <div class="pocket-row">
+            <div class="pocket top-pocket"></div><span class="xsep">×</span>
+            <div class="pocket top-pocket"></div><span class="xsep">×</span>
+            <div class="pocket top-pocket"></div><span class="xsep">×</span>
+            <div class="pocket top-pocket"></div><span class="xsep">×</span>
+            <div class="pocket top-pocket"></div><span class="xsep">×</span>
+            <div class="pocket top-pocket"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hinge-bar-b"><div class="rivet"></div><div class="rivet"></div></div>
+    <div class="ob-bottom">
+      <div class="wood-panel wood">
+        <div class="ob-bottom-inner">
+          <div class="corner bl"></div><div class="corner br"></div>
+          <div class="pocket-row">
+            <div class="pocket bottom-pocket"></div><span class="xsep">×</span>
+            <div class="pocket bottom-pocket"></div><span class="xsep">×</span>
+            <div class="pocket bottom-pocket"></div><span class="xsep">×</span>
+            <div class="pocket bottom-pocket"></div><span class="xsep">×</span>
+            <div class="pocket bottom-pocket"></div><span class="xsep">×</span>
+            <div class="pocket bottom-pocket"></div>
+          </div>
+          <div class="hasil-row">
+            <div class="hasil-tag" id="hasilBtn">HASIL
+              <div class="countdown-bar" id="countdownBar" style="display:none;"></div>
+            </div>
+          </div>
+          <div class="bead-palette">
+            <div class="bead red"   data-color="#d64545"></div>
+            <div class="bead blue"  data-color="#3b82f6"></div>
+            <div class="bead green" data-color="#22c55e"></div>
+          </div>
+          <button class="btn-tutup" onclick="closeKoper()">✕ TUTUP</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-  const dust=document.getElementById('dust');
-for(let i=0;i<30;i++){
-  const s=document.createElement('span');
-  const sz=Math.random()*2.5+0.5;
-  s.style.cssText=
-  `left:${Math.random()*100}%;
-  width:${sz}px;
-  height:${sz}px;
-  animation-duration:${Math.random()*14+7}s;
-  animation-delay:${Math.random()*12}s;`;
-  dust.appendChild(s);
-}
-function openK(){
-  document.getElementById('kw').classList.add('opened');
-  setTimeout(()=>{
-    document.getElementById('ob').classList.add('visible');
-  },550);
-}
-function closeK(){
-  //////////////////////////////
-  // reset hasil
-  //////////////////////////////
-  hasilBtn.innerHTML =
-  'HASIL';
-  //////////////////////////////
-  // kosongkan semua pocket
-  //////////////////////////////
-  const pockets =
-  document.querySelectorAll(
-    '.pocket'
-  );
-  pockets.forEach(p=>{
-    p.innerHTML = '';
+/* ══ PAGE NAVIGATION ══ */
+const GAME_ELS=['c','ctrl','hint','boardWrap','ghost','btn-back-game'];
+let currentPage='page-intro';
+
+function goTo(pageId){
+  document.getElementById(currentPage).classList.remove('active');
+  document.getElementById(currentPage).classList.add('hidden');
+  document.getElementById(pageId).classList.remove('hidden');
+  document.getElementById(pageId).classList.add('active');
+  currentPage=pageId;
+  const showGame=(pageId==='page-game');
+  GAME_ELS.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){
+      if(id==='btn-back-game'){
+        el.style.display=showGame?'block':'none';
+      } else {
+        el.style.display=showGame?'':'none';
+        el.style.pointerEvents=showGame?'':'none';
+      }
+    }
   });
-  //////////////////////////////
-  // reset dropdown soal
-  //////////////////////////////
-  soalSelect.value = '';
-  //////////////////////////////
-  // reset dropdown sifat
-  //////////////////////////////
-  sifatSelect.value = '';
-  //////////////////////////////
-  // tutup koper
-  //////////////////////////////
-  document
-  .getElementById('ob')
-  .classList
-  .remove('visible');
+  if(showGame){
+    document.getElementById('c').style.display='block';
+    document.getElementById('btn-back-game').style.display='block';
+    setTimeout(()=>{ window.dispatchEvent(new Event('resize')); },60);
+  }
+}
+
+/* FIX: Tombol kembali dari game — kembali ke panduan */
+function backFromGame(){
+  cancelDrag();
+  resetSemua();
+  // Tutup koper jika terbuka
+  if(isOpen){
+    document.getElementById('boardWrap').classList.remove('vis');
+    document.getElementById('boardWrap').style.pointerEvents='none';
+    document.getElementById('boardWrap').style.visibility='hidden';
+    closeKoper3D();
+  }
+  goTo('page-panduan');
+}
+
+// Sembunyikan semua elemen game di awal
+GAME_ELS.forEach(id=>{
+  const el=document.getElementById(id);
+  if(el){
+    if(id==='btn-back-game'){
+      el.style.display='none';
+    } else {
+      el.style.display='none';
+      el.style.pointerEvents='none';
+    }
+  }
+});
+
+const canvas=document.getElementById('c');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.setClearColor(0x000000,0);
+const scene3=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(38,1,0.1,100);
+function resize(){
+  const W=window.innerWidth,H=window.innerHeight;
+  renderer.setSize(W,H,false);camera.aspect=W/H;camera.updateProjectionMatrix();
+}
+resize();window.addEventListener('resize',resize);
+scene3.add(new THREE.AmbientLight(0xfff5e8,0.85));
+const dL=new THREE.DirectionalLight(0xfff0d0,1.05);dL.position.set(2,4,5);scene3.add(dL);
+const dL2=new THREE.DirectionalLight(0xffe0a0,0.28);dL2.position.set(-3,1,-2);scene3.add(dL2);
+
+function makeWood(dk=0,w=512,h=512){
+  const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle=`rgb(${Math.max(0,107-dk)},${Math.max(0,53-Math.round(dk*.5))},${Math.max(0,21-Math.round(dk*.3))})`;
+  ctx.fillRect(0,0,w,h);
+  const t=h*Math.tan(Math.PI/180);
+  for(let x=-t-12;x<w+t+12;x+=12){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x-t,h);ctx.strokeStyle='rgba(0,0,0,0.09)';ctx.lineWidth=1;ctx.stroke();}
+  for(let x=-t-28;x<w+t+28;x+=28){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+t,h);ctx.strokeStyle='rgba(255,255,255,0.035)';ctx.lineWidth=2;ctx.stroke();}
+  const tex=new THREE.CanvasTexture(cv);tex.wrapS=tex.wrapT=THREE.RepeatWrapping;return tex;
+}
+const mFr=new THREE.MeshLambertMaterial({map:makeWood(0)});
+const mBk=new THREE.MeshLambertMaterial({map:makeWood(55)});
+const mSd=new THREE.MeshLambertMaterial({map:makeWood(20,128,512)});
+const mTp=new THREE.MeshLambertMaterial({map:makeWood(10,512,128)});
+const mBt=new THREE.MeshLambertMaterial({map:makeWood(30,512,128)});
+const mBr=new THREE.MeshPhongMaterial({color:0xb8922a,specular:0xffd060,shininess:70});
+const mBrD=new THREE.MeshLambertMaterial({color:0x7a5e18});
+const mHdl=new THREE.MeshPhongMaterial({color:0x8a6820,specular:0xffe080,shininess:55});
+
+const KW=3.2,KH=2.0,KD=0.44,TH=0.02,HH=KH/2;
+const koper=new THREE.Group();scene3.add(koper);
+function bx(w,h,d,m){return new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);}
+
+const stG=new THREE.Group();koper.add(stG);
+[
+  [KW,KH,TH,mBk,[0,0,-KD/2+TH/2]],
+  [TH,KH,KD,mSd,[-KW/2+TH/2,0,0]],
+  [TH,KH,KD,mSd,[KW/2-TH/2,0,0]],
+  [KW,TH,KD,mTp,[0,HH-TH/2,0]],
+  [KW,TH,KD,mBt,[0,-HH+TH/2,0]],
+].forEach(([w,h,d,m,p])=>{const mesh=bx(w,h,d,m);mesh.position.set(...p);stG.add(mesh);});
+
+const stripBk=bx(KW+0.01,0.03,0.015,mBrD);stripBk.position.set(0,0,-KD/2-0.002);stG.add(stripBk);
+[[-KW/2+0.048,HH-0.048],[KW/2-0.048,HH-0.048],[-KW/2+0.048,-HH+0.048],[KW/2-0.048,-HH+0.048]].forEach(([x,y])=>{
+  const c=bx(0.085,0.085,0.03,mBrD);c.position.set(x,y,-KD/2-0.008);stG.add(c);
+});
+[-KW/2-0.008,KW/2+0.008].forEach(x=>[HH-0.048,-HH+0.048].forEach(y=>{
+  const c=bx(0.032,0.085,0.085,mBr);c.position.set(x,y,0);stG.add(c);
+}));
+
+const fTop=bx(KW,HH,TH,mFr);fTop.position.set(0,HH/2,KD/2-TH/2);koper.add(fTop);
+const fBot=bx(KW,HH,TH,mFr);fBot.position.set(0,-HH/2,KD/2-TH/2);koper.add(fBot);
+
+const stripF=bx(KW+0.01,0.055,0.028,mBr);stripF.position.set(0,0,KD/2+0.004);koper.add(stripF);
+const rivArr=[];
+[-1.05,-0.35,0.35,1.05].forEach(x=>{
+  const r=new THREE.Mesh(new THREE.SphereGeometry(0.03,8,8),mBr);
+  r.position.set(x,0,KD/2+0.022);koper.add(r);rivArr.push(r);
+});
+const cornF=[];
+[[-KW/2+0.048,HH-0.048],[KW/2-0.048,HH-0.048],[-KW/2+0.048,-HH+0.048],[KW/2-0.048,-HH+0.048]].forEach(([x,y])=>{
+  const c=bx(0.1,0.1,0.038,mBr);c.position.set(x,y,KD/2+0.01);koper.add(c);cornF.push(c);
+});
+
+const btnCv=document.createElement('canvas');btnCv.width=256;btnCv.height=80;
+const bCtx2=btnCv.getContext('2d');
+bCtx2.fillStyle='#f5ece0';bCtx2.fillRect(0,0,256,80);
+bCtx2.strokeStyle='#b8922a';bCtx2.lineWidth=5;bCtx2.strokeRect(3,3,250,74);
+bCtx2.fillStyle='rgba(255,255,255,0.55)';bCtx2.fillRect(8,8,240,6);
+bCtx2.fillStyle='#3d1f0a';bCtx2.font='bold 28px "Playfair Display",Georgia,serif';
+bCtx2.textAlign='center';bCtx2.textBaseline='middle';bCtx2.fillText('BUKA',128,40);
+const btnMesh=bx(0.46,0.145,0.04,new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(btnCv)}));
+btnMesh.position.set(0,0,KD/2+0.025);koper.add(btnMesh);
+
+const hCv=new THREE.CatmullRomCurve3([
+  new THREE.Vector3(-0.24,0,0),new THREE.Vector3(-0.24,0.22,0),
+  new THREE.Vector3(0,0.3,0),new THREE.Vector3(0.24,0.22,0),new THREE.Vector3(0.24,0,0),
+]);
+const hMesh=new THREE.Mesh(new THREE.TubeGeometry(hCv,30,0.024,8,false),mHdl);
+hMesh.position.set(0,HH-TH,0);stG.add(hMesh);
+[-0.24,0.24].forEach(x=>{
+  const r=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.04,0.036,10),mBr);
+  r.rotation.x=Math.PI/2;r.position.set(x,HH-TH,0.015);stG.add(r);
+});
+
+const SLIDE=KH*1.1,ROT=4*Math.PI/180;
+const T0=HH/2,B0=-HH/2;
+let isOpen=false;
+let tTY=T0,tBY=B0,tTRX=0,tBRX=0;
+let cTY=T0,cBY=B0,cTRX=0,cBRX=0;
+
+function openKoper3D(){
+  isOpen=true;tTY=T0+SLIDE;tTRX=-ROT;tBY=B0-SLIDE;tBRX=ROT;
+  btnMesh.visible=false;stripF.visible=false;
+  rivArr.forEach(r=>r.visible=false);cornF.forEach(c=>c.visible=false);
+  smoothCorners=null;
+}
+function closeKoper3D(){
+  isOpen=false;tTY=T0;tTRX=0;tBY=B0;tBRX=0;
+  btnMesh.visible=true;stripF.visible=true;
+  rivArr.forEach(r=>r.visible=true);cornF.forEach(c=>c.visible=true);
+}
+
+let rotX=0.28,rotY=-0.35,dist=5.2;
+let isDrag=false,sx=0,sy=0,vx=0,vy=0,rafI=null;
+const DMIN=2.5,DMAX=9;
+function updCam(){
+  camera.position.x=dist*Math.sin(rotY)*Math.cos(rotX);
+  camera.position.y=dist*Math.sin(rotX);
+  camera.position.z=dist*Math.cos(rotY)*Math.cos(rotX);
+  camera.lookAt(0,0,0);
+}
+updCam();
+document.getElementById('cbIn').onclick=()=>{dist=Math.max(DMIN,dist-0.6);updCam();};
+document.getElementById('cbOut').onclick=()=>{dist=Math.min(DMAX,dist+0.6);updCam();};
+document.getElementById('cbReset').onclick=()=>{rotX=0.28;rotY=-0.35;dist=5.2;updCam();};
+canvas.addEventListener('wheel',e=>{e.preventDefault();dist=Math.min(DMAX,Math.max(DMIN,dist+e.deltaY*0.004));updCam();},{passive:false});
+
+const ray=new THREE.Raycaster();const mpos2=new THREE.Vector2();
+function isBoardElem(el){return !!(el&&el.closest('#boardWrap'));}
+function isCtrlElem(el){return !!(el&&el.closest('#ctrl'));}
+function isBackBtn(el){return !!(el&&el.closest('#btn-back-game'));}
+
+canvas.addEventListener('mousedown',e=>{
+  if(e.button!==0)return;
+  if(isCtrlElem(e.target))return;
+  if(isBackBtn(e.target))return;
+  if(!isOpen){
+    mpos2.x=(e.clientX/window.innerWidth)*2-1;
+    mpos2.y=-(e.clientY/window.innerHeight)*2+1;
+    ray.setFromCamera(mpos2,camera);
+    if(ray.intersectObject(btnMesh).length>0){openKoper();return;}
+  }
+  isDrag=true;sx=e.clientX;sy=e.clientY;vx=0;vy=0;
+  cancelAnimationFrame(rafI);canvas.classList.add('drag');canvas.classList.remove('grab');
+  e.preventDefault();
+});
+document.addEventListener('mousemove',e=>{
+  if(!isDrag)return;
+  const dx=e.clientX-sx,dy=e.clientY-sy;
+  vx=dx;vy=dy;rotY+=dx*0.007;rotX-=dy*0.007;
+  rotX=Math.max(-1.2,Math.min(1.2,rotX));sx=e.clientX;sy=e.clientY;updCam();
+});
+document.addEventListener('mouseup',e=>{
+  if(e.button!==0)return;
+  if(isDrag){isDrag=false;canvas.classList.remove('drag');canvas.classList.add('grab');inertia();}
+});
+document.addEventListener('mouseleave',()=>{if(isDrag){isDrag=false;inertia();}});
+let ltx=0,lty=0,pd0=0,d0=5.2;
+canvas.addEventListener('touchstart',e=>{
+  if(e.touches.length===2){pd0=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);d0=dist;return;}
+  if(isBoardElem(document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY)))return;
+  ltx=e.touches[0].clientX;lty=e.touches[0].clientY;vx=0;vy=0;cancelAnimationFrame(rafI);
+},{passive:true});
+canvas.addEventListener('touchmove',e=>{
+  if(e.touches.length===2){e.preventDefault();const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);dist=Math.min(DMAX,Math.max(DMIN,d0*(pd0/d)));updCam();return;}
+  if(isBoardElem(document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY)))return;
+  e.preventDefault();const t=e.touches[0];
+  vx=t.clientX-ltx;vy=t.clientY-lty;rotY+=vx*0.008;rotX-=vy*0.008;
+  rotX=Math.max(-1.2,Math.min(1.2,rotX));ltx=t.clientX;lty=t.clientY;updCam();
+},{passive:false});
+canvas.addEventListener('touchend',()=>inertia(),{passive:true});
+function inertia(){
+  cancelAnimationFrame(rafI);let lv=vx,lvy=vy;
+  (function step(){if(Math.abs(lv)<0.3&&Math.abs(lvy)<0.3)return;
+    lv*=0.88;lvy*=0.88;rotY+=lv*0.007;rotX-=lvy*0.007;
+    rotX=Math.max(-1.2,Math.min(1.2,rotX));updCam();rafI=requestAnimationFrame(step);
+  })();
+}
+
+function openKoper(){
+  openKoper3D();
   setTimeout(()=>{
-    document
-    .getElementById('kw')
-    .classList
-    .remove('opened');
-  },400);
+    document.getElementById('boardWrap').classList.add('vis');
+    document.getElementById('boardWrap').style.pointerEvents='all';
+    document.getElementById('boardWrap').style.visibility='visible';
+  },750);
+}
+function closeKoper(){
+  cancelDrag();resetSemua();
+  document.getElementById('boardWrap').classList.remove('vis');
+  document.getElementById('boardWrap').style.pointerEvents='none';
+  document.getElementById('boardWrap').style.visibility='hidden';
+  closeKoper3D();
+}
+
+/* Board matrix3d dengan smoothing anti-jitter */
+const boardWrap=document.getElementById('boardWrap');
+const BOARD_W=600,BOARD_H=372;
+let smoothCorners=null;
+const SMOOTH=0.35;
+
+function projectPt(x,y,z){
+  const v=new THREE.Vector3(x,y,z).applyMatrix4(koper.matrixWorld).project(camera);
+  return{sx:(v.x*.5+.5)*window.innerWidth,sy:(-.5*v.y+.5)*window.innerHeight};
+}
+function getBoardCorners(){
+  const z=KD/2-TH+0.001,x=KW/2-TH,y=HH-TH;
+  return[projectPt(-x,y,z),projectPt(x,y,z),projectPt(x,-y,z),projectPt(-x,-y,z)];
+}
+function adjM(m){return[m[4]*m[8]-m[5]*m[7],m[2]*m[7]-m[1]*m[8],m[1]*m[5]-m[2]*m[4],m[5]*m[6]-m[3]*m[8],m[0]*m[8]-m[2]*m[6],m[2]*m[3]-m[0]*m[5],m[3]*m[7]-m[4]*m[6],m[1]*m[6]-m[0]*m[7],m[0]*m[4]-m[1]*m[3]];}
+function mulMM(a,b){const r=[];for(let i=0;i<3;i++)for(let j=0;j<3;j++){let v=0;for(let k=0;k<3;k++)v+=a[i*3+k]*b[k*3+j];r.push(v);}return r;}
+function mulMV(m,v){return[m[0]*v[0]+m[1]*v[1]+m[2]*v[2],m[3]*v[0]+m[4]*v[1]+m[5]*v[2],m[6]*v[0]+m[7]*v[1]+m[8]*v[2]];}
+function basisM(p1,p2,p3,p4){const m=[p1[0],p2[0],p3[0],p1[1],p2[1],p3[1],1,1,1];const v=mulMV(adjM(m),[p4[0],p4[1],1]);return mulMM(m,[v[0],0,0,0,v[1],0,0,0,v[2]]);}
+function computeMat3d(d){
+  const dp=[[d[0].sx,d[0].sy],[d[1].sx,d[1].sy],[d[3].sx,d[3].sy],[d[2].sx,d[2].sy]];
+  const srcB=basisM([0,0],[BOARD_W,0],[0,BOARD_H],[BOARD_W,BOARD_H]);
+  const dstB=basisM(dp[0],dp[1],dp[2],dp[3]);
+  const H=mulMM(dstB,adjM(srcB));const n=H[8];const m=H.map(v=>v/n);
+  return[m[0],m[3],0,m[6],m[1],m[4],0,m[7],0,0,1,0,m[2],m[5],0,m[8]].join(',');
+}
+function updateBoardTransform(){
+  if(!isOpen||Math.abs(cTY-T0)<SLIDE*0.05)return;
+  const normalWorld=new THREE.Vector3(0,0,1).applyQuaternion(koper.quaternion).normalize();
+  const koperPos=new THREE.Vector3();koper.getWorldPosition(koperPos);
+  const toCam=new THREE.Vector3().subVectors(camera.position,koperPos).normalize();
+  const dot=normalWorld.dot(toCam);
+  if(dot<=0.05){boardWrap.style.visibility='hidden';return;}
+  boardWrap.style.visibility='visible';
+  const raw=getBoardCorners();
+  if(!smoothCorners)smoothCorners=raw.map(c=>({sx:c.sx,sy:c.sy}));
+  for(let i=0;i<4;i++){
+    smoothCorners[i].sx+=(raw[i].sx-smoothCorners[i].sx)*SMOOTH;
+    smoothCorners[i].sy+=(raw[i].sy-smoothCorners[i].sy)*SMOOTH;
+  }
+  try{boardWrap.style.transform='matrix3d('+computeMat3d(smoothCorners)+')'}catch(e){}
+}
+
+const LP=0.072;function lp(a,b){return a+(b-a)*LP;}
+function animate(){
+  requestAnimationFrame(animate);
+  cTY=lp(cTY,tTY);cTRX=lp(cTRX,tTRX);cBY=lp(cBY,tBY);cBRX=lp(cBRX,tBRX);
+  fTop.position.y=cTY;fTop.rotation.x=cTRX;
+  fBot.position.y=cBY;fBot.rotation.x=cBRX;
+  koper.updateMatrixWorld(true);
+  renderer.render(scene3,camera);
+  updateBoardTransform();
+}
+animate();
+
+/* GAME LOGIC */
+const soalPerSifat={
+  perkalian:        {label:'3² × 3⁴ = ?',     key:'1'},
+  pembagian:        {label:'2⁶ ÷ 2² = ?',      key:'2'},
+  'pangkat-pangkat':{label:'(3²)³ = ?',         key:'3'},
+  'perkalian-dalam':{label:'(2 × 3)³ = ?',      key:'4'},
+  nol:              {label:'5⁰ = ?',            key:'5'},
+  negatif:          {label:'2⁻² = ?',           key:'6'},
+  campuran:         {label:'2² × 2³ ÷ 2⁴ = ?', key:'7'},
+};
+const jawaban={
+  '1':{bentuk:'3⁶',    atas:[1,1,1,1,1,1],bawah:[],       warna:false},
+  '2':{bentuk:'2⁴',    atas:[1,1,1,1,1,1],bawah:[1,1],    warna:false},
+  '3':{bentuk:'3⁶',    atas:[2,2,2],       bawah:[],       warna:false},
+  '4':{bentuk:'2³×3³', atas:[3,3,3],       bawah:[],       warna:true},
+  '5':{bentuk:'1',     atas:[],            bawah:[],       warna:false},
+  '6':{bentuk:'1/4',   atas:[],            bawah:[1,1],    warna:false},
+  '7':{bentuk:'2¹',    atas:[1,1,1,1,1],  bawah:[1,1,1,1],warna:false},
+};
+let soalAktif=null,idleTimer=null,rafId=null;
+const DELAY=5000;
+const sifatSel=document.getElementById('sifatSelect');
+const soalDisp=document.getElementById('soalDisplay');
+const hasilBtn=document.getElementById('hasilBtn');
+const cBar=document.getElementById('countdownBar');
+const ghost=document.getElementById('ghost');
+function resetSemua(){
+  soalAktif=null;sifatSel.value='';
+  soalDisp.textContent='PILIH SOAL';soalDisp.classList.remove('aktif');
+  resetHasil();document.querySelectorAll('.pocket').forEach(p=>p.innerHTML='');
 }
 function resetHasil(){
-  hasilBtn.innerHTML = 'HASIL';
+  clearTimeout(idleTimer);cancelAnimationFrame(rafId);
+  cBar.style.display='none';hasilBtn.textContent='HASIL';hasilBtn.className='hasil-tag';
+  hasilBtn.appendChild(cBar);
 }
-function animasiPembagian(){
-  //////////////////////////////
-  // ambil pocket
-  //////////////////////////////
-  const topPockets =
-  document.querySelectorAll(
-    '.top-pocket'
-  );
-  const bottomPockets =
-  document.querySelectorAll(
-    '.bottom-pocket'
-  );
-  //////////////////////////////
-  // hitung total bawah
-  //////////////////////////////
-  let totalBawah = 0;
-  bottomPockets.forEach(p=>{
-    totalBawah +=
-    p.querySelectorAll(
-      '.filled-bead'
-    ).length;
-  });
-  //////////////////////////////
-  // hapus semua manik bawah
-  //////////////////////////////
-  bottomPockets.forEach(p=>{
-    p.innerHTML = '';
-  });
-  //////////////////////////////
-  // hapus manik atas
-  //////////////////////////////
-  let sisaHapus =
-  totalBawah;
-  topPockets.forEach(p=>{
-    const manik =
-    p.querySelectorAll(
-      '.filled-bead'
-    );
-    if(
-      manik.length > 0
-      &&
-      sisaHapus > 0
-    ){
-      manik[
-        manik.length - 1
-      ].remove();
-      sisaHapus--;
-    }
-  });
-}
-const beads =
-document.querySelectorAll('.bead');
-const pockets =
-document.querySelectorAll('.pocket');
-//////////////////////////////
-// CEK JAWABAN
-//////////////////////////////
-const hasilBtn =
-document.getElementById('hasilBtn');
-const soalSelect =
-document.getElementById('soalSelect');
-const sifatSelect =
-document.getElementById('sifatSelect');
-//////////////////////////////
-// RESET SAAT GANTI
-//////////////////////////////
-soalSelect.addEventListener(
-'change',
-resetHasil
-);
-sifatSelect.addEventListener(
-'change',
-resetHasil
-);
-const jawabanSoal = {
-  // 3² × 3⁴
-  "1" : {
-    bentuk:"3⁶",
-    atas:[1, 1, 1, 1, 1, 1],
-    bawah:[]
-  },
-  // 2⁶ ÷ 2²
-  "2" : {
-    bentuk:"2⁴",
-    atas:[1,1,1,1,1,1],
-    bawah:[1,1]
-  },
-  // (3²)³
-  "3" : {
-    bentuk:"3⁶",
-    atas:[2,2,2],
-    bawah:[]
-  },
-  // (2 × 3)³
-  "4" : {
-    bentuk:"2³ × 3³ ",
-    atas:[3, 3, 3],
-    bawah:[]
-  },
-  // 5⁰
-  "5" : {
-    bentuk:"1",
-    atas:[],
-    bawah:[]
-  },
-  // 6⁻²
-  "6" : {
-    bentuk:"1/4",
-    atas:[],
-    bawah:[1, 1]
-  },
-  // 2² × 2³ ÷ 2⁴
-  "7" : {
-    bentuk:"2¹",
-    atas:[1,1,1,1,1],
-    bawah:[1,1,1,1]
-  }
-};
-function cekWarnaBerbeda(){
-  const topPockets =
-  document.querySelectorAll(
-    '.top-pocket'
-  );
-  const warnaDipakai = [];
-  topPockets.forEach(p=>{
-    const bead =
-    p.querySelector(
-      '.filled-bead'
-    );
-    if(bead){
-      warnaDipakai.push(
-        bead.style.background
-      );
-    }
-  });
-  //////////////////////////////
-  // hapus duplikat
-  //////////////////////////////
-  const unik =
-  [...new Set(warnaDipakai)];
-  //////////////////////////////
-  // true jika semua beda
-  //////////////////////////////
-  return unik.length === warnaDipakai.length;
-}
-// tombol hasil
-hasilBtn.addEventListener('click',()=>{
-  const soalDipilih =
-  soalSelect.value;
-  if(!soalDipilih){
-    hasilBtn.innerHTML =
-    'PILIH';
-    return;
-  }
-  const data =
-  jawabanSoal[soalDipilih];
-  //////////////////////////////
-  // BACA KOTAK ATAS
-  //////////////////////////////
-  const topPockets =
-  document.querySelectorAll(
-    '.top-pocket'
-  );
-  const hasilAtas = [];
-  topPockets.forEach(p=>{
-    const jumlah =
-    p.querySelectorAll(
-      '.filled-bead'
-    ).length;
-    // kosong = 1
-    if(jumlah > 0){
-      hasilAtas.push(jumlah);
-    }
-  });
-  //////////////////////////////
-  // BACA KOTAK BAWAH
-  //////////////////////////////
-  const bottomPockets =
-  document.querySelectorAll(
-    '.bottom-pocket'
-  );
-  const hasilBawah = [];
-  bottomPockets.forEach(p=>{
-    const jumlah =
-    p.querySelectorAll(
-      '.filled-bead'
-    ).length;
-    if(jumlah > 0){
-      hasilBawah.push(jumlah);
-    }
-  });
-  //////////////////////////////
-  // CEK
-  //////////////////////////////
-  const atasBenar =
-  JSON.stringify(hasilAtas)
-  ===
-  JSON.stringify(data.atas);
-  const bawahBenar =
-  JSON.stringify(hasilBawah)
-  ===
-  JSON.stringify(data.bawah);
-  if(
-  atasBenar
-  &&
-  bawahBenar
-){
-  //////////////////////////////////
-  // KHUSUS PERKALIAN DALAM
-  //////////////////////////////////
-  if(soalDipilih === "4"){
-    const warnaBenar =
-    cekWarnaBerbeda();
-    if(!warnaBenar){
-      hasilBtn.innerHTML =
-      'WARNA';
-      return;
-    }
-  }
-  if(
-  soalDipilih === "2"
-  ||
-  soalDipilih === "7"
-  ){
-    animasiPembagian();
-  }
-  hasilBtn.innerHTML =
-  data.bentuk;
-}
+sifatSel.addEventListener('change',()=>{
+  const s=sifatSel.value;
+  document.querySelectorAll('.pocket').forEach(p=>p.innerHTML='');
+  resetHasil();
+  if(!s){soalAktif=null;soalDisp.textContent='PILIH SOAL';soalDisp.classList.remove('aktif');return;}
+  soalAktif=soalPerSifat[s].key;
+  soalDisp.textContent=soalPerSifat[s].label;soalDisp.classList.add('aktif');
 });
-let draggedColor = null;
-//////////////////////////////
-// DRAG WARNA
-//////////////////////////////
-beads.forEach(bead=>{
-  bead.addEventListener(
-    'dragstart',
-    ()=>{
-      draggedColor =
-      bead.dataset.color;
-    }
-  );
+function onChange(){
+  resetHasil();
+  const total=[...document.querySelectorAll('.pocket')].reduce((s,p)=>s+p.querySelectorAll('.filled-bead').length,0);
+  if(!total||!soalAktif)return;
+  cBar.style.display='block';
+  const t0=performance.now();
+  function frame(now){const f=Math.min((now-t0)/DELAY,1);cBar.style.transform=`scaleX(${1-f})`;if(f<1)rafId=requestAnimationFrame(frame);}
+  rafId=requestAnimationFrame(frame);
+  idleTimer=setTimeout(()=>{cancelAnimationFrame(rafId);cBar.style.display='none';evaluasi();},DELAY);
+}
+function evaluasi(){
+  if(!soalAktif)return;
+  const d=jawaban[soalAktif];
+  const tops=[...document.querySelectorAll('.top-pocket')];
+  const bots=[...document.querySelectorAll('.bottom-pocket')];
+  const a=tops.map(p=>p.querySelectorAll('.filled-bead').length).filter(n=>n>0);
+  const b=bots.map(p=>p.querySelectorAll('.filled-bead').length).filter(n=>n>0);
+  const ok1=JSON.stringify(a)===JSON.stringify(d.atas);
+  const ok2=JSON.stringify(b)===JSON.stringify(d.bawah);
+  let ok3=true;
+  if(d.warna){const w=tops.map(p=>p.querySelector('.filled-bead')?.style.background).filter(Boolean);ok3=new Set(w).size===w.length&&w.length>0;}
+  if(ok1&&ok2&&ok3){hasilBtn.textContent=d.bentuk;hasilBtn.className='hasil-tag benar';if(soalAktif==='2'||soalAktif==='7')animPembagian();}
+  else{hasilBtn.textContent='SALAH';hasilBtn.className='hasil-tag salah';}
+}
+function animPembagian(){
+  const tops=document.querySelectorAll('.top-pocket');
+  const bots=document.querySelectorAll('.bottom-pocket');
+  let n=[...bots].reduce((s,p)=>s+p.querySelectorAll('.filled-bead').length,0);
+  bots.forEach(p=>p.innerHTML='');
+  tops.forEach(p=>{const m=p.querySelectorAll('.filled-bead');if(m.length&&n>0){m[m.length-1].remove();n--;}});
+}
+let drag={on:false,mode:null,color:null,srcPocket:null};
+function startDrag(mode,color,srcPocket,startX,startY){
+  drag={on:true,mode,color,srcPocket:srcPocket||null};
+  ghost.style.background=color;ghost.style.left=startX+'px';ghost.style.top=startY+'px';
+  ghost.style.display='block';document.body.style.cursor='grabbing';
+}
+function cancelDrag(){
+  if(!drag.on)return;
+  if(drag.mode==='move'&&drag.srcPocket){addBeadDOM(drag.srcPocket,drag.color);onChange();}
+  endDragCleanup();
+}
+function endDragCleanup(){
+  ghost.style.display='none';document.body.style.cursor='';
+  document.querySelectorAll('.pocket').forEach(p=>p.classList.remove('drop-ok','drop-no'));
+  drag={on:false,mode:null,color:null,srcPocket:null};
+}
+function elemUnder(x,y){ghost.style.display='none';const el=document.elementFromPoint(x,y);ghost.style.display='block';return el;}
+document.querySelectorAll('.bead').forEach(bead=>{
+  bead.addEventListener('mousedown',e=>{if(e.button!==0)return;e.preventDefault();startDrag('add',bead.dataset.color,null,e.clientX,e.clientY);});
 });
-//////////////////////////////
-// DROP KE KOTAK
-//////////////////////////////
-pockets.forEach(pocket=>{
-  // izinkan drop
-  pocket.addEventListener(
-    'dragover',
-    (e)=>{
-      e.preventDefault();
-    }
-  );
-  // ketika dijatuhkan
-pocket.addEventListener(
-    'drop',
-    (e)=>{
-      e.preventDefault();
-      // wajib ada warna
-      if(!draggedColor) return;
-      // hitung isi
-      const jumlahManik =
-      pocket.querySelectorAll(
-        '.filled-bead'
-      ).length;
-      // max 8
-      if(jumlahManik >= 8){
-        return;
-      }
-      // buat manik
-      const bead =
-      document.createElement('div');
-      bead.classList.add(
-        'filled-bead'
-      );
-      bead.style.background =
-      draggedColor;
-      // masukkan ke pocket
-      pocket.appendChild(bead);
-      // reset hasil
-      resetHasil();
-    }
-  );
-  //////////////////////////////
-  // HAPUS MANIK
-  //////////////////////////////
-  pocket.addEventListener(
-    'contextmenu',
-    (e)=>{
-      e.preventDefault();
-      const manik =
-      pocket.querySelectorAll(
-        '.filled-bead'
-      );
-      if(manik.length > 0){
-        manik[
-          manik.length - 1
-        ].remove();
-        resetHasil();
-      }
-    }
-  );
+function addBeadDOM(pocket,color){
+  if(pocket.querySelectorAll('.filled-bead').length>=8)return false;
+  const b=document.createElement('div');b.className='filled-bead';b.style.background=color;
+  b.addEventListener('mousedown',onFilledBeadDown);pocket.appendChild(b);return true;
+}
+function onFilledBeadDown(e){
+  if(e.button!==0)return;e.preventDefault();e.stopPropagation();
+  const pocket=this.closest('.pocket');const color=this.style.background;
+  this.remove();onChange();startDrag('move',color,pocket,e.clientX,e.clientY);
+}
+document.addEventListener('mousemove',e=>{
+  if(!drag.on)return;
+  ghost.style.left=e.clientX+'px';ghost.style.top=e.clientY+'px';
+  const under=elemUnder(e.clientX,e.clientY);const hoverPocket=under?under.closest('.pocket'):null;
+  document.querySelectorAll('.pocket').forEach(p=>{
+    p.classList.remove('drop-ok','drop-no');
+    if(p===hoverPocket)p.classList.add(p.querySelectorAll('.filled-bead').length>=8?'drop-no':'drop-ok');
+  });
+},{passive:true});
+document.addEventListener('mouseup',e=>{
+  if(!drag.on||e.button!==0)return;
+  const under=elemUnder(e.clientX,e.clientY);const tp=under?under.closest('.pocket'):null;
+  const isSrc=drag.mode==='move'&&tp===drag.srcPocket;
+  const isOther=tp&&!isSrc;
+  if(isOther){if(!addBeadDOM(tp,drag.color)){if(drag.mode==='move'&&drag.srcPocket)addBeadDOM(drag.srcPocket,drag.color);}onChange();}
+  else if(isSrc){addBeadDOM(drag.srcPocket,drag.color);onChange();}
+  else if(drag.mode!=='add')onChange();
+  endDragCleanup();
 });
+document.addEventListener('mouseleave',()=>{if(drag.on)cancelDrag();});
+document.addEventListener('contextmenu',e=>e.preventDefault());
 </script>
 </body>
 </html>
