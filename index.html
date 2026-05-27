@@ -842,19 +842,31 @@ document.addEventListener('mouseup',e=>{
 });
 document.addEventListener('mouseleave',()=>{if(isDrag){isDrag=false;inertia();}});
 let ltx=0,lty=0,pd0=0,d0=5.2;
+let touchMoved=false;
 canvas.addEventListener('touchstart',e=>{
-  if(e.touches.length===2){pd0=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);d0=dist;return;}
+  if(e.touches.length===2){pd0=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);d0=dist;touchMoved=false;return;}
   if(isBoardElem(document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY)))return;
-  ltx=e.touches[0].clientX;lty=e.touches[0].clientY;vx=0;vy=0;cancelAnimationFrame(rafI);
+  ltx=e.touches[0].clientX;lty=e.touches[0].clientY;vx=0;vy=0;touchMoved=false;cancelAnimationFrame(rafI);
 },{passive:true});
 canvas.addEventListener('touchmove',e=>{
-  if(e.touches.length===2){e.preventDefault();const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);dist=Math.min(DMAX,Math.max(DMIN,d0*(pd0/d)));updCam();return;}
+  if(e.touches.length===2){e.preventDefault();const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);dist=Math.min(DMAX,Math.max(DMIN,d0*(pd0/d)));updCam();touchMoved=true;return;}
   if(isBoardElem(document.elementFromPoint(e.touches[0].clientX,e.touches[0].clientY)))return;
   e.preventDefault();const t=e.touches[0];
-  vx=t.clientX-ltx;vy=t.clientY-lty;rotY+=vx*0.008;rotX-=vy*0.008;
+  const mdx=t.clientX-ltx,mdy=t.clientY-lty;
+  if(Math.abs(mdx)>4||Math.abs(mdy)>4)touchMoved=true;
+  vx=mdx;vy=mdy;rotY+=mdx*0.008;rotX-=mdy*0.008;
   rotX=Math.max(-1.2,Math.min(1.2,rotX));ltx=t.clientX;lty=t.clientY;updCam();
 },{passive:false});
-canvas.addEventListener('touchend',()=>inertia(),{passive:true});
+canvas.addEventListener('touchend',e=>{
+  if(!touchMoved&&!isOpen&&e.changedTouches.length===1){
+    const t=e.changedTouches[0];
+    mpos2.x=(t.clientX/window.innerWidth)*2-1;
+    mpos2.y=-(t.clientY/window.innerHeight)*2+1;
+    ray.setFromCamera(mpos2,camera);
+    if(ray.intersectObject(btnMesh).length>0){openKoper();return;}
+  }
+  inertia();
+},{passive:true});
 function inertia(){
   cancelAnimationFrame(rafI);let lv=vx,lvy=vy;
   (function step(){if(Math.abs(lv)<0.3&&Math.abs(lvy)<0.3)return;
