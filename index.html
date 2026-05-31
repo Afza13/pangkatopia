@@ -109,7 +109,7 @@ body{
 }
 
 /* ══════════════════════════════════
-   HALAMAN PANDUAN — MULTI-STEP
+   HALAMAN PANDUAN
 ══════════════════════════════════ */
 #page-panduan{
   background:radial-gradient(ellipse at 40% 35%,#251408 0%,#080401 100%);
@@ -119,7 +119,6 @@ body{
   justify-content:center;
 }
 
-/* Container utama panduan */
 .panduan-outer{
   width:100%;
   height:100%;
@@ -128,270 +127,6 @@ body{
   align-items:center;
   justify-content:flex-start;
   overflow:hidden;
-}
-
-/* Progress bar atas */
-.panduan-progress-bar{
-  width:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  padding:10px 0 6px;
-  flex-shrink:0;
-}
-.panduan-prog-dot{
-  width:8px;height:8px;border-radius:50%;
-  background:rgba(184,146,42,0.25);
-  border:1.5px solid rgba(184,146,42,0.4);
-  transition:all .3s;
-}
-.panduan-prog-dot.aktif{
-  background:#b8922a;
-  box-shadow:0 0 8px rgba(184,146,42,0.6);
-  width:22px;border-radius:4px;
-}
-.panduan-prog-dot.done{
-  background:rgba(184,146,42,0.55);
-}
-
-/* Slide wrapper */
-.panduan-slides-wrap{
-  flex:1;
-  width:100%;
-  overflow:hidden;
-  position:relative;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-/* Setiap slide */
-.panduan-slide{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:0.5rem 1rem;
-  opacity:0;
-  pointer-events:none;
-  transform:translateX(60px);
-  transition:opacity .4s ease, transform .4s ease;
-}
-.panduan-slide.aktif{
-  opacity:1;
-  pointer-events:all;
-  transform:translateX(0);
-}
-.panduan-slide.keluar-kiri{
-  opacity:0;
-  transform:translateX(-60px);
-}
-
-/* Card dalam setiap slide */
-.panduan-card{
-  background:rgba(30,14,4,0.88);
-  border:2px solid rgba(184,146,42,0.35);
-  border-radius:18px;
-  padding:1.6rem 2rem;
-  max-width:600px;
-  width:92vw;
-  max-height:calc(100vh - 130px);
-  overflow-y:auto;
-  box-shadow:0 8px 60px rgba(0,0,0,0.7);
-  backdrop-filter:blur(12px);
-  display:flex;flex-direction:column;gap:1rem;
-  scrollbar-width:thin;
-  scrollbar-color:rgba(184,146,42,0.3) transparent;
-}
-.panduan-card::-webkit-scrollbar{width:4px;}
-.panduan-card::-webkit-scrollbar-track{background:transparent;}
-.panduan-card::-webkit-scrollbar-thumb{background:rgba(184,146,42,0.3);border-radius:2px;}
-
-/* Judul slide */
-.panduan-slide-header{
-  display:flex;
-  align-items:center;
-  gap:0.8rem;
-}
-.panduan-slide-badge{
-  flex-shrink:0;
-  width:36px;height:36px;
-  background:linear-gradient(135deg,#b8922a,#7a5e18);
-  border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Playfair Display',serif;
-  font-size:1rem;font-weight:900;
-  color:#f5ece0;
-  box-shadow:0 2px 10px rgba(184,146,42,0.4);
-}
-.panduan-slide-title{
-  font-family:'Playfair Display',serif;
-  font-size:1.2rem;font-weight:900;
-  color:#f5ece0;
-  letter-spacing:2px;
-  line-height:1.2;
-}
-.panduan-slide-title span{color:#b8922a;}
-
-.panduan-divider{
-  width:100%;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(184,146,42,0.45),transparent);
-  flex-shrink:0;
-}
-
-/* Tabel panduan */
-.panduan-table{
-  width:100%;border-collapse:collapse;
-  font-family:'Lato',sans-serif;font-size:0.82rem;
-  color:rgba(245,236,224,0.88);
-}
-.panduan-table thead tr{
-  background:rgba(184,146,42,0.22);
-}
-.panduan-table thead th{
-  padding:7px 10px;text-align:left;
-  font-weight:700;letter-spacing:1.5px;
-  font-size:0.76rem;color:#f5ece0;
-  border-bottom:2px solid rgba(184,146,42,0.5);
-}
-.panduan-table tbody tr{border-bottom:1px solid rgba(255,255,255,0.07);}
-.panduan-table tbody tr:last-child{border-bottom:none;}
-.panduan-table tbody td{padding:6px 10px;vertical-align:top;line-height:1.55;}
-.panduan-table tbody td:first-child{text-align:center;font-weight:700;color:#b8922a;}
-
-/* Teks biasa */
-.panduan-text{
-  font-family:'Lato',sans-serif;font-size:0.84rem;
-  color:rgba(245,236,224,0.82);line-height:1.65;
-}
-
-/* Kotak aturan */
-.panduan-aturan-box{
-  border:1.5px solid rgba(184,146,42,0.45);
-  border-radius:10px;padding:1rem 1.1rem;
-  background:rgba(184,146,42,0.07);
-  display:flex;flex-direction:column;gap:0.5rem;
-}
-.panduan-aturan-title{
-  font-family:'Lato',sans-serif;font-size:0.76rem;
-  font-weight:700;letter-spacing:2.5px;
-  color:#b8922a;text-align:center;
-}
-.panduan-aturan-body{
-  font-family:'Lato',sans-serif;font-size:0.82rem;
-  color:rgba(245,236,224,0.85);line-height:1.7;
-}
-.panduan-aturan-body b{color:#f5ece0;}
-
-/* Sub heading */
-.panduan-sub{
-  font-family:'Lato',sans-serif;font-size:0.88rem;
-  font-weight:700;color:#b8922a;
-  letter-spacing:0.5px;margin:0.3rem 0 0.15rem;
-  display:flex;align-items:center;gap:0.5rem;
-}
-.panduan-sub::before{
-  content:'';display:inline-block;width:14px;height:2px;
-  background:#b8922a;border-radius:2px;flex-shrink:0;
-}
-
-/* List */
-.panduan-list{
-  list-style:none;padding:0;margin:0;
-  display:flex;flex-direction:column;gap:0.3rem;
-}
-.panduan-list li{
-  font-family:'Lato',sans-serif;font-size:0.82rem;
-  color:rgba(245,236,224,0.82);line-height:1.55;
-  padding-left:1.2rem;position:relative;
-}
-.panduan-list li::before{
-  content:'•';position:absolute;left:0;
-  color:#b8922a;font-weight:700;
-}
-
-/* Nomor list */
-.panduan-numlist{
-  list-style:none;padding:0;margin:0;
-  display:flex;flex-direction:column;gap:0.45rem;
-  counter-reset:numlist;
-}
-.panduan-numlist li{
-  font-family:'Lato',sans-serif;font-size:0.82rem;
-  color:rgba(245,236,224,0.82);line-height:1.55;
-  padding-left:1.8rem;position:relative;
-  counter-increment:numlist;
-}
-.panduan-numlist li::before{
-  content:counter(numlist)'.';
-  position:absolute;left:0;
-  color:#b8922a;font-weight:700;font-size:0.8rem;
-}
-
-/* Sifat eksponen box */
-.sifat-box{
-  background:rgba(184,146,42,0.08);
-  border:1.5px solid rgba(184,146,42,0.35);
-  border-radius:10px;
-  padding:0.9rem 1rem;
-  display:flex;flex-direction:column;gap:0.5rem;
-}
-.sifat-header{
-  display:flex;align-items:center;gap:0.6rem;
-}
-.sifat-label{
-  font-family:'Lato',sans-serif;font-size:0.7rem;
-  font-weight:700;letter-spacing:2px;
-  color:#b8922a;text-transform:uppercase;
-  background:rgba(184,146,42,0.15);
-  padding:2px 8px;border-radius:3px;
-  flex-shrink:0;
-}
-.sifat-formula{
-  font-family:'Playfair Display',serif;
-  font-size:1rem;font-weight:700;
-  color:#f5ece0;
-}
-.sifat-contoh{
-  font-family:'Lato',sans-serif;font-size:0.79rem;
-  color:rgba(184,146,42,0.9);font-style:italic;
-  letter-spacing:0.3px;
-}
-.sifat-steps{
-  display:flex;flex-direction:column;gap:0.28rem;
-  margin-top:0.2rem;
-}
-.sifat-steps li{
-  font-family:'Lato',sans-serif;font-size:0.8rem;
-  color:rgba(245,236,224,0.8);line-height:1.55;
-  padding-left:1.6rem;position:relative;
-  list-style:none;
-}
-.sifat-steps li::before{
-  position:absolute;left:0;
-  color:#b8922a;font-weight:700;font-size:0.76rem;
-}
-.sifat-kesimpulan{
-  font-family:'Lato',sans-serif;font-size:0.8rem;
-  color:rgba(245,236,224,0.9);
-  background:rgba(184,146,42,0.12);
-  border-radius:6px;padding:0.4rem 0.7rem;
-  margin-top:0.1rem;font-style:italic;
-}
-
-/* Navigasi bawah panduan */
-.panduan-nav-row{
-  width:92vw;max-width:600px;
-  display:flex;gap:0.8rem;justify-content:space-between;align-items:center;
-  padding:8px 0 10px;
-  flex-shrink:0;
-}
-.panduan-nav-info{
-  font-family:'Lato',sans-serif;font-size:0.72rem;
-  letter-spacing:2px;color:rgba(184,146,42,0.55);
-  text-align:center;flex:1;
 }
 
 /* ── TOMBOL NAVIGASI ── */
@@ -640,12 +375,6 @@ body{
     .pol{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:0.4rem;counter-reset:pol;}
     .pol li{font-family:'Lato',sans-serif;font-size:0.81rem;color:rgba(245,236,224,0.82);line-height:1.55;padding-left:1.8rem;position:relative;counter-increment:pol;}
     .pol li::before{content:counter(pol)'.';position:absolute;left:0;color:#b8922a;font-weight:700;font-size:0.79rem;}
-    .ptbl{width:100%;border-collapse:collapse;font-family:'Lato',sans-serif;font-size:0.79rem;color:rgba(245,236,224,0.88);}
-    .ptbl thead tr{background:rgba(184,146,42,0.2);}
-    .ptbl thead th{padding:6px 8px;text-align:left;font-weight:700;letter-spacing:1px;font-size:0.74rem;color:#f5ece0;border-bottom:2px solid rgba(184,146,42,0.5);}
-    .ptbl tbody tr{border-bottom:1px solid rgba(255,255,255,0.07);}
-    .ptbl tbody td{padding:5px 8px;vertical-align:top;line-height:1.5;}
-    .ptbl tbody td:first-child{text-align:center;font-weight:700;color:#b8922a;}
     .pbox{border:1.5px solid rgba(184,146,42,0.45);border-radius:10px;padding:0.85rem 1rem;background:rgba(184,146,42,0.07);display:flex;flex-direction:column;gap:0.55rem;}
     .pboxtitle{font-family:'Lato',sans-serif;font-size:0.7rem;font-weight:700;letter-spacing:2.5px;color:#b8922a;text-align:center;}
     .pboxbody{font-family:'Lato',sans-serif;font-size:0.81rem;color:rgba(245,236,224,0.85);line-height:1.7;}
@@ -665,52 +394,9 @@ body{
     <div class="ptabs" id="ptabs"></div>
     <div class="pslides">
 
+      <!-- SLIDE 0: CARA PENGGUNAAN (ATURAN DASAR) -->
       <div class="pslide on" id="ps-0"><div class="pc2">
-        <div class="ph"><div class="pbadge">I</div><div class="phtitle">DESKRIPSI <span>UMUM</span></div></div>
-        <div class="pdiv"></div>
-        <p class="pp">Media pembelajaran Pangkatopia merupakan alat bantu visual dan manipulatif yang dirancang untuk membantu siswa memahami konsep eksponen secara konkret dan interaktif. Media ini berbentuk papan dengan beberapa kantong transparan yang disusun menjadi dua bagian utama, yaitu baris atas dan dua baris bawah. Setiap kantong digunakan untuk menempatkan manik-manik berwarna yang berfungsi sebagai representasi dari nilai pangkat, sedangkan warna manik melambangkan basis yang sama.</p>
-        <p class="pp">Secara keseluruhan, Pangkatopia menggabungkan unsur visual, kinestetik, dan konseptual dalam pembelajaran. Media ini tidak hanya membantu siswa memahami aturan eksponen, tetapi juga meningkatkan keterlibatan, keaktifan, dan pemahaman yang lebih mendalam karena siswa belajar melalui pengalaman langsung. Dengan demikian, Pangkatopia menjadi media yang efektif untuk menjembatani konsep matematika yang abstrak menjadi lebih konkret dan mudah dipahami.</p>
-      </div></div>
-
-      <div class="pslide" id="ps-1"><div class="pc2">
-        <div class="ph"><div class="pbadge">II</div><div class="phtitle">TUJUAN <span>PEMBELAJARAN</span></div></div>
-        <div class="pdiv"></div>
-        <ol class="pol">
-          <li>Membantu siswa memahami konsep serta sifat-sifat perpangkatan secara lebih mendalam, sehingga tidak hanya mengandalkan hafalan rumus.</li>
-          <li>Meningkatkan kemampuan siswa dalam menggunakan sifat-sifat perpangkatan untuk menyelesaikan berbagai bentuk permasalahan matematika.</li>
-          <li>Meminimalkan kesalahan yang sering dilakukan siswa dalam operasi perpangkatan melalui penyajian materi yang lebih sistematis dan mudah diikuti.</li>
-          <li>Mendorong tumbuhnya minat dan motivasi belajar siswa dengan menghadirkan pengalaman belajar yang lebih menarik dan tidak monoton.</li>
-          <li>Menyediakan alternatif media pembelajaran yang dapat membantu guru dalam menyampaikan materi secara lebih efektif dan variatif.</li>
-        </ol>
-      </div></div>
-
-      <div class="pslide" id="ps-2"><div class="pc2">
-        <div class="ph"><div class="pbadge">III</div><div class="phtitle">ALAT <span>&amp; BAHAN</span></div></div>
-        <div class="pdiv"></div>
-        <div class="psub">Alat</div>
-        <table class="ptbl"><thead><tr><th>No.</th><th>Alat</th><th>Keterangan</th></tr></thead><tbody>
-          <tr><td>1</td><td>Palu</td><td>Alat atau perkakas untuk memaku</td></tr>
-          <tr><td>2</td><td>Gunting</td><td>Menggunting kertas laminating</td></tr>
-          <tr><td>3</td><td>Mesin Gergaji</td><td>Mesin pemotong kayu untuk memotong bahan dasar papan</td></tr>
-          <tr><td>4</td><td>Kuas</td><td>Kuas untuk mengecat bahan dasar papan</td></tr>
-        </tbody></table>
-        <div class="psub">Bahan</div>
-        <table class="ptbl"><thead><tr><th>No.</th><th>Bahan</th><th>Keterangan</th></tr></thead><tbody>
-          <tr><td>1</td><td>Triplek</td><td>Bahan dasar papan</td></tr>
-          <tr><td>2</td><td>Engsel</td><td>Agar papan bisa dilipat</td></tr>
-          <tr><td>3</td><td>Kayu</td><td>Untuk pinggiran papan</td></tr>
-          <tr><td>4</td><td>Paku</td><td>Merekatkan bahan dasar</td></tr>
-          <tr><td>5</td><td>Cat</td><td>Mewarnai bahan dasar kayu</td></tr>
-          <tr><td>6</td><td>Cup Plastik</td><td>Untuk 2 baris kantong meletakkan manik-manik</td></tr>
-          <tr><td>7</td><td>Double Tape</td><td>Merekatkan kantong manik ke papan</td></tr>
-          <tr><td>8</td><td>Wadah Penyimpan</td><td>Untuk menyimpan manik-manik agar tidak mudah hilang</td></tr>
-          <tr><td>9</td><td>Kartu Label</td><td>Untuk judul, soal, sifat, dan hasil perpangkatan</td></tr>
-          <tr><td>10</td><td>Manik-manik</td><td>Sebagai pemisalan variabel yang dimasukkan ke kantong</td></tr>
-        </tbody></table>
-      </div></div>
-
-      <div class="pslide" id="ps-3"><div class="pc2">
-        <div class="ph"><div class="pbadge">IV</div><div class="phtitle">CARA <span>PENGGUNAAN</span></div></div>
+        <div class="ph"><div class="pbadge">I</div><div class="phtitle">CARA <span>PENGGUNAAN</span></div></div>
         <div class="pdiv"></div>
         <div class="pbox">
           <div class="pboxtitle">ATURAN DASAR ALAT PERAGA</div>
@@ -720,8 +406,9 @@ body{
         </div>
       </div></div>
 
-      <div class="pslide" id="ps-4"><div class="pc2">
-        <div class="ph"><div class="pbadge">V</div><div class="phtitle">CARA PENGGUNAAN <span>(1)</span></div></div>
+      <!-- SLIDE 1: CARA PENGGUNAAN (1) -->
+      <div class="pslide" id="ps-1"><div class="pc2">
+        <div class="ph"><div class="pbadge">II</div><div class="phtitle">CARA PENGGUNAAN <span>(1)</span></div></div>
         <div class="pdiv"></div>
         <div class="swrap">
           <div class="stop"><span class="slbl">SIFAT 1</span><span class="sform">a&#7504; &times; a&#8319; = a&#7504;&#8314;&#8319;</span></div>
@@ -747,8 +434,9 @@ body{
         </div>
       </div></div>
 
-      <div class="pslide" id="ps-5"><div class="pc2">
-        <div class="ph"><div class="pbadge">VI</div><div class="phtitle">CARA PENGGUNAAN <span>(2)</span></div></div>
+      <!-- SLIDE 2: CARA PENGGUNAAN (2) -->
+      <div class="pslide" id="ps-2"><div class="pc2">
+        <div class="ph"><div class="pbadge">III</div><div class="phtitle">CARA PENGGUNAAN <span>(2)</span></div></div>
         <div class="pdiv"></div>
         <div class="swrap">
           <div class="stop"><span class="slbl">SIFAT 3</span><span class="sform">a&#7504; &divide; a&#8319; = a&#7504;&#8315;&#8319;</span></div>
@@ -765,8 +453,9 @@ body{
         </div>
       </div></div>
 
-      <div class="pslide" id="ps-6"><div class="pc2">
-        <div class="ph"><div class="pbadge">VII</div><div class="phtitle">CARA PENGGUNAAN <span>(3)</span></div></div>
+      <!-- SLIDE 3: CARA PENGGUNAAN (3) -->
+      <div class="pslide" id="ps-3"><div class="pc2">
+        <div class="ph"><div class="pbadge">IV</div><div class="phtitle">CARA PENGGUNAAN <span>(3)</span></div></div>
         <div class="pdiv"></div>
         <div class="swrap">
           <div class="stop"><span class="slbl">SIFAT 4</span><span class="sform">(a&#7504;)&#8319; = a&#7504;&#8319;</span></div>
@@ -791,8 +480,9 @@ body{
         </div>
       </div></div>
 
-      <div class="pslide" id="ps-7"><div class="pc2">
-        <div class="ph"><div class="pbadge">VIII</div><div class="phtitle">CARA PENGGUNAAN <span>(4)</span></div></div>
+      <!-- SLIDE 4: CARA PENGGUNAAN (4) -->
+      <div class="pslide" id="ps-4"><div class="pc2">
+        <div class="ph"><div class="pbadge">V</div><div class="phtitle">CARA PENGGUNAAN <span>(4)</span></div></div>
         <div class="pdiv"></div>
         <div class="swrap">
           <div class="stop"><span class="slbl">CAMPURAN 1</span><span class="sform">a&#7504; &times; a&#8319; &divide; a&#7480;</span></div>
@@ -819,7 +509,8 @@ body{
         </div>
       </div></div>
 
-      <div class="pslide" id="ps-8"><div class="pc2">
+      <!-- SLIDE 5: SIAP BERMAIN -->
+      <div class="pslide" id="ps-5"><div class="pc2">
         <div class="ph"><div class="pbadge">&#9733;</div><div class="phtitle">SIAP <span>BERMAIN!</span></div></div>
         <div class="pdiv"></div>
         <p class="pp" style="text-align:center;">Kamu telah membaca seluruh panduan Pangkatopia. Sekarang saatnya mempraktikkan secara langsung dengan alat peraga interaktif 3D!</p>
@@ -837,13 +528,13 @@ body{
     <div class="pnav" id="pnav">
       <button class="nav-btn secondary" id="pprev" onclick="panduNav(-1)" style="font-size:0.78rem;padding:0.5rem 1.2rem;letter-spacing:1.5px;">&#8249; Sebelumnya</button>
       <button class="nav-btn secondary" id="pback" onclick="goTo('page-intro')" style="font-size:0.78rem;padding:0.5rem 1.2rem;letter-spacing:1.5px;display:none;">&#8249; Kembali</button>
-      <div class="pnavinfo" id="pinfo">1 / 9</div>
+      <div class="pnavinfo" id="pinfo">1 / 6</div>
       <button class="nav-btn primary" id="pnext" onclick="panduNav(1)" style="font-size:0.78rem;padding:0.5rem 1.2rem;letter-spacing:1.5px;">Selanjutnya &#8250;</button>
     </div>
   </div>
   <script>
   document.addEventListener('DOMContentLoaded', function(){
-    var T=9,c=0;
+    var T=6,c=0;
     var tabs=document.getElementById('ptabs');
     if(!tabs) return;
     for(var i=0;i<T;i++){
