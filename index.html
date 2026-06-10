@@ -254,6 +254,7 @@ body{
   border:2px solid var(--brass);border-radius:3px;
   box-shadow:0 2px 6px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.5);}
 .select-tag{appearance:none;cursor:pointer;outline:none;min-width:180px;text-align:center;pointer-events:all;}
+.select-tag:disabled{opacity:0.45;cursor:not-allowed;}
 .soal-display{background:var(--label-bg);color:var(--label-text);font-family:'Lato',sans-serif;
   font-size:14px;font-weight:700;letter-spacing:2.5px;padding:4px 14px;
   border:2px solid var(--brass);border-radius:3px;
@@ -595,18 +596,36 @@ body{
         <div class="ob-top-inner">
           <div class="corner tl"></div><div class="corner tr"></div>
           <div class="board-title">PANGKATOPIA</div>
-          <div class="lbl-row">
-            <select class="tag select-tag" id="sifatSelect">
-              <option value="">SIFAT</option>
-              <option value="perkalian">aᵐ × aⁿ = aᵐ⁺ⁿ</option>
-              <option value="pembagian">aᵐ ÷ aⁿ = aᵐ⁻ⁿ</option>
-              <option value="pangkat-pangkat">(aᵐ)ⁿ = aᵐⁿ</option>
-              <option value="perkalian-dalam">(a × b)ⁿ = aⁿ × bⁿ</option>
-              <option value="nol">a⁰ = 1  (a ≠ 0)</option>
-              <option value="negatif">a⁻ⁿ = 1 / aⁿ</option>
-              <option value="campuran">Operasi Campuran</option>
+          <div class="lbl-row" style="gap:5px;align-items:flex-end;">
+            <div style="display:flex;flex-direction:row;align-items:flex-end;gap:2px;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+                <span style="font-family:'Lato',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;color:rgba(61,31,10,0.6);">SIFAT 1</span>
+                <select class="tag select-tag" id="sifatSelect" style="min-width:0;width:120px;">
+                  <option value="">SIFAT</option>
+                  <option value="perkalian">aᵐ × aⁿ = aᵐ⁺ⁿ</option>
+                  <option value="pembagian">aᵐ ÷ aⁿ = aᵐ⁻ⁿ</option>
+                  <option value="pangkat-pangkat">(aᵐ)ⁿ = aᵐⁿ</option>
+                  <option value="perkalian-dalam">(a × b)ⁿ = aⁿ × bⁿ</option>
+                  <option value="nol">a⁰ = 1  (a ≠ 0)</option>
+                  <option value="negatif">a⁻ⁿ = 1 / aⁿ</option>
+                </select>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+                <span style="font-family:'Lato',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;color:rgba(61,31,10,0.6);">SIFAT 2</span>
+                <select class="tag select-tag" id="sifatSelect2" style="min-width:0;width:120px;">
+                  <option value="">SIFAT</option>
+                  <option value="perkalian">aᵐ × aⁿ = aᵐ⁺ⁿ</option>
+                  <option value="pembagian">aᵐ ÷ aⁿ = aᵐ⁻ⁿ</option>
+                  <option value="pangkat-pangkat">(aᵐ)ⁿ = aᵐⁿ</option>
+                  <option value="perkalian-dalam">(a × b)ⁿ = aⁿ × bⁿ</option>
+                  <option value="nol">a⁰ = 1  (a ≠ 0)</option>
+                  <option value="negatif">a⁻ⁿ = 1 / aⁿ</option>
+                </select>
+              </div>
+            </div>
+            <select class="tag select-tag" id="soalSelect">
+              <option value="">PILIH SOAL</option>
             </select>
-            <div class="soal-display" id="soalDisplay">PILIH SOAL</div>
           </div>
           <div class="pocket-row">
             <div class="pocket top-pocket"></div><span class="xsep">×</span>
@@ -965,13 +984,13 @@ animate();
 
 /* GAME LOGIC */
 const soalPerSifat={
-  perkalian:        {label:'3² × 3⁴ = ?',     key:'1'},
-  pembagian:        {label:'2⁶ ÷ 2² = ?',      key:'2'},
-  'pangkat-pangkat':{label:'(3²)³ = ?',         key:'3'},
-  'perkalian-dalam':{label:'(2 × 3)³ = ?',      key:'4'},
-  nol:              {label:'5⁰ = ?',            key:'5'},
-  negatif:          {label:'2⁻² = ?',           key:'6'},
-  campuran:         {label:'2² × 2³ ÷ 2⁴ = ?', key:'7'},
+  perkalian:        [{label:'3² × 3⁴ = ?',     key:'1'}],
+  pembagian:        [{label:'2⁶ ÷ 2² = ?',      key:'2'}],
+  'pangkat-pangkat':[{label:'(3²)³ = ?',         key:'3'}],
+  'perkalian-dalam':[{label:'(2 × 3)³ = ?',      key:'4'}],
+  nol:              [{label:'5⁰ = ?',            key:'5'}],
+  negatif:          [{label:'2⁻² = ?',           key:'6'}],
+  campuran:         [{label:'2² × 2³ ÷ 2⁴ = ?', key:'7'}],
 };
 const jawaban={
   '1':{bentuk:'3⁶',    atas:[1,1,1,1,1,1],bawah:[],       warna:false},
@@ -985,13 +1004,15 @@ const jawaban={
 let soalAktif=null,idleTimer=null,rafId=null;
 const DELAY=5000;
 const sifatSel=document.getElementById('sifatSelect');
-const soalDisp=document.getElementById('soalDisplay');
+const sifatSel2=document.getElementById('sifatSelect2');
+const soalSel=document.getElementById('soalSelect');
 const hasilBtn=document.getElementById('hasilBtn');
 const cBar=document.getElementById('countdownBar');
 const ghost=document.getElementById('ghost');
 function resetSemua(){
-  soalAktif=null;sifatSel.value='';
-  soalDisp.textContent='PILIH SOAL';soalDisp.classList.remove('aktif');
+  soalAktif=null;
+  sifatSel.value='';sifatSel2.value='';
+  soalSel.value='';
   resetHasil();document.querySelectorAll('.pocket').forEach(p=>p.innerHTML='');
 }
 function resetHasil(){
@@ -999,13 +1020,35 @@ function resetHasil(){
   cBar.style.display='none';hasilBtn.textContent='HASIL';hasilBtn.className='hasil-tag';
   hasilBtn.appendChild(cBar);
 }
-sifatSel.addEventListener('change',()=>{
-  const s=sifatSel.value;
+
+(function populateAllSoal(){
+  const allSoal=[
+    {label:'3\u00b2 \u00d7 3\u2074 = ?',     key:'1'},
+    {label:'2\u2076 \u00f7 2\u00b2 = ?',     key:'2'},
+    {label:'(3\u00b2)\u00b3 = ?',        key:'3'},
+    {label:'(2 \u00d7 3)\u00b3 = ?',     key:'4'},
+    {label:'5\u2070 = ?',           key:'5'},
+    {label:'2\u207b\u00b2 = ?',          key:'6'},
+    {label:'2\u00b2 \u00d7 2\u00b3 \u00f7 2\u2074 = ?',key:'7'},
+  ];
+  allSoal.forEach(o=>{
+    const opt=document.createElement('option');
+    opt.value=o.key;opt.textContent=o.label;
+    soalSel.appendChild(opt);
+  });
+  soalSel.disabled=false;
+})();
+
+soalSel.addEventListener('change',()=>{
+  const k=soalSel.value;
   document.querySelectorAll('.pocket').forEach(p=>p.innerHTML='');
   resetHasil();
-  if(!s){soalAktif=null;soalDisp.textContent='PILIH SOAL';soalDisp.classList.remove('aktif');return;}
-  soalAktif=soalPerSifat[s].key;
-  soalDisp.textContent=soalPerSifat[s].label;soalDisp.classList.add('aktif');
+  if(!k){soalAktif=null;return;}
+  soalAktif=k;
+  if(k==='7'){
+    sifatSel.value='perkalian';
+    sifatSel2.value='pembagian';
+  }
 });
 function onChange(){
   resetHasil();
